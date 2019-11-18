@@ -1,4 +1,4 @@
-void moving_circles(char screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
+void moving_circles(byte screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
   for (int i = 0; i < 1000; i++) {
     int r1 = i % 37;
     int r2 = i % 29;

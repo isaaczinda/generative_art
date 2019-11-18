@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 // number of cols
 #define WIDTH 25
@@ -29,7 +31,7 @@ void draw_circle(byte[HEIGHT][WIDTH][PIXEL_SIZE], double, int, int, int, color);
 
 #include "archive.h"
 
-void static_circles(char screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
+void static_circles(byte screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
   for (int i = 0; i < 1000; i++) {
     int r1 = i % 37;
     int r2 = i % 29;
@@ -40,13 +42,12 @@ void static_circles(char screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
     color c1 = { 255, (i-100)%256, 0, 255 };
     color c2 = { 0, 255, i%256, 255 };
     color c3 = { (i+200)%256, 0, 255, 255 };
-    color c4 = { 256, (i+100)%256, 0, 255 };
+    color c4 = { 255, (i+100)%256, 0, 255 };
     color c5 = { 0, 255, (i+200)%256, 255 };
 
     clear_frame(screen);
     draw_circle(screen, r1, 200, 2, 2, c1);
     draw_circle(screen, r1 + 1, 200, 2, 2, c1);
-    // draw_circle(screen, r1 + 4, 200, 2, 2, c1);
 
     draw_circle(screen, r2, 100, 6, 12, c2);
     draw_circle(screen, r2 + 4, 100, 6, 12, c2);
@@ -54,7 +55,6 @@ void static_circles(char screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
     draw_circle(screen, r3, 100, 15, 22, c3);
     draw_circle(screen, r3+1, 100, 15, 22, c3);
     draw_circle(screen, r3+2, 100, 15, 22, c3);
-
 
     draw_circle(screen, r4, 100, 23, 6, c4);
 
@@ -67,18 +67,12 @@ int main() {
   byte screen[HEIGHT][WIDTH][PIXEL_SIZE];
 
   static_circles(screen);
-
-  // for (int r = 0; r < 15; r++) {
-  //   clear_frame(screen);
-  //   draw_circle(screen, r, 20, 15, 15);
-  //   render_frame(screen);
-  // }
 }
 
 
 // mode = 1: opaque
 // mode = 0: transparent
-void draw_circle(unsigned char screen[HEIGHT][WIDTH][PIXEL_SIZE], double radius,
+void draw_circle(byte screen[HEIGHT][WIDTH][PIXEL_SIZE], double radius,
                  int num_points, int center_x, int center_y,
                  color circle_color)
 {
@@ -119,6 +113,7 @@ void render_frame(byte frame[HEIGHT][WIDTH][PIXEL_SIZE]) {
 
   sprintf(frame_name, "frames/frame_%d.txt", frame_number);
 
+  int result = mkdir("frames", 0777); // create frames dir if it doesn't exist
   FILE* fd = fopen(frame_name, "w+");
 
   for (int h = 0; h < HEIGHT; h++) {

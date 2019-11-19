@@ -1,0 +1,51 @@
+0x // waiting for strip controller to change to FLUSHING state
+1x // strip controller in FLUSHING state
+1x // byte controller in WRITING_START state
+11 // bit controller in WRITING state
+11
+11
+11
+11
+11
+11
+11
+11
+11
+11
+11
+11
+11
+11
+11
+11
+11
+11
+11
+11
+11
+11
+11
+11
+11
+11
+11
+11
+11
+11
+11 // 32nd 1
+10
+10
+10
+10
+10
+10
+10
+10
+10
+10
+10
+10
+10
+10
+10
+10 // 18th 0

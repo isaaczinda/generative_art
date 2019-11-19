@@ -1,0 +1,21 @@
+//charlie/AcadHome/Engineering/E85FA18/izinda/final_project/neopixel_driver.sv {1 {vlog -work work -sv -stats=none //charlie/AcadHome/Engineering/E85FA18/izinda/final_project/neopixel_driver.sv
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module neopixel_driver
+-- Compiling module RAM
+-- Compiling module bit_transmitter
+-- Compiling module byte_transmitter
+-- Compiling module strip_controller
+-- Compiling module spi
+-- Compiling module spi_controller
+
+Top level modules:
+	neopixel_driver
+
+} {} {}} //charlie/AcadHome/Engineering/E85FA18/izinda/final_project/testbench.sv {1 {vlog -work work -sv -stats=none //charlie/AcadHome/Engineering/E85FA18/izinda/final_project/testbench.sv
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module strip_controller_testbench
+
+Top level modules:
+	strip_controller_testbench
+
+} {} {}}

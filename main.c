@@ -16,6 +16,10 @@
 #define GREEN 1
 #define BLUE 2
 
+#define FLASH_CONSTANT 170 // 0b10101010
+#define RENDERING 1 // outputs frame to local files when non-zero
+#define SPI_ON 0 // outputs frame to strips over SPI when non-zero
+
 typedef unsigned char byte;
 
 typedef struct {
@@ -26,6 +30,7 @@ typedef struct {
 } color;
 
 void render_frame(byte[HEIGHT][WIDTH][PIXEL_SIZE]);
+void send_frame(byte[HEIGHT][WIDTH][PIXEL_SIZE]);
 void clear_frame(byte[HEIGHT][WIDTH][PIXEL_SIZE]);
 void draw_circle(byte[HEIGHT][WIDTH][PIXEL_SIZE], double, int, int, int, color);
 
@@ -59,7 +64,12 @@ void static_circles(byte screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
     draw_circle(screen, r4, 100, 23, 6, c4);
 
     draw_circle(screen, r5, 100, 13, 17, c5);
-    render_frame(screen);
+    if(RENDERING){
+      render_frame(screen);
+    }
+    if(SPI_ON){
+      send_frame(screen);
+    }
   }
 }
 
@@ -105,6 +115,45 @@ void clear_frame(byte screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
       screen[y][x][BLUE] = 0;
     }
   }
+}
+
+// TODO: replace with spi header file
+void spi_send_byte(byte data){
+  printf("SPI output: %u\n", data);
+}
+
+// TODO: replace with gpio pin header file
+void set_cs_high(){
+  printf("CS: High\n");
+}
+
+void set_cs_low(){
+  printf("CS: Low\n");
+}
+
+void flush(){
+  set_cs_high();
+  spi_send_byte(FLASH_CONSTANT);
+  set_cs_low();
+}
+
+void send_strip(byte strip_number, byte strip_data[WIDTH][PIXEL_SIZE]){
+  set_cs_high();
+  spi_send_byte(strip_number); // Start by sending strip number
+  for (int w = 0; w < WIDTH; w++) {
+    for (int p = 0; p < PIXEL_SIZE; p++){
+      spi_send_byte(strip_data[w][p]); // send all of the data from the strip using "burst mode"
+    }
+  }
+  set_cs_low();
+}
+
+
+void send_frame(byte frame[HEIGHT][WIDTH][PIXEL_SIZE]){
+  for (int h = 0; h < HEIGHT; h++) {
+    send_strip(h,frame[h]);
+  }
+  flush();
 }
 
 void render_frame(byte frame[HEIGHT][WIDTH][PIXEL_SIZE]) {

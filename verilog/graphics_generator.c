@@ -2,18 +2,18 @@
 // #includes
 ////////////////////////////////////////////////
 
-// #include "SAM4S4B.h"
+#include "SAM4S4B.h"
 
-// #include <stdio.h>
-// #include <stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include "SAM4S4B_lab7\SAM4S4B.h"
 
 // number of cols
-#define WIDTH 2
+#define WIDTH 25
 
 // number of rows
-#define HEIGHT 1
+#define HEIGHT 24
 
 #define PIXEL_SIZE 3
 
@@ -21,10 +21,7 @@
 #define GREEN 1
 #define BLUE 2
 
-#define FLASH_CONSTANT 70 // 0b01000110
-
-#define FLUSHING_PIN PIO_PA27
-#define CS_PIN PIO_PA28
+#define FLASH_CONSTANT 170 // 0b10101010
 
 typedef unsigned char byte;
 
@@ -76,8 +73,6 @@ int main() {
 	samInit();
   pioInit();
   spiInit(MCK_FREQ/244000, 0, 1);
-	pioPinMode(CS_PIN, PIO_OUTPUT);
-	pioPinMode(FLUSHING_PIN, PIO_INPUT);
 	
   byte screen[HEIGHT][WIDTH][PIXEL_SIZE];
 
@@ -117,23 +112,23 @@ void clear_frame(byte screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
     for (int y = 0; y < HEIGHT; y++) {
       screen[y][x][RED] = 0;
       screen[y][x][GREEN] = 0;
-      screen[y][x][BLUE] = 100;
+      screen[y][x][BLUE] = 0;
     }
   }
 }
 
+// TODO: replace with spi header file
 void spi_send_byte(byte data){
-	while (pioDigitalRead(FLUSHING_PIN));
-  spiSendReceive(data);
+  printf("SPI output: %u\n", data);
 }
 
 // TODO: replace with gpio pin header file
 void set_cs_high(){
-  pioDigitalWrite(CS_PIN, PIO_HIGH);
+  printf("CS: High\n");
 }
 
 void set_cs_low(){
-  pioDigitalWrite(CS_PIN, PIO_LOW);
+  printf("CS: Low\n");
 }
 
 void flush(){
@@ -145,7 +140,6 @@ void flush(){
 void send_strip(byte strip_number, byte strip_data[WIDTH][PIXEL_SIZE]){
   set_cs_high();
   spi_send_byte(strip_number); // Start by sending strip number
-	spi_send_byte(0); // 0 offset
   for (int w = 0; w < WIDTH; w++) {
     for (int p = 0; p < PIXEL_SIZE; p++){
       spi_send_byte(strip_data[w][p]); // send all of the data from the strip using "burst mode"

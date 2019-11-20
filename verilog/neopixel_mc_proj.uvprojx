@@ -10,7 +10,6 @@
       <TargetName>Target 1</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -380,68 +379,6 @@
       <Groups>
         <Group>
           <GroupName>Source Group 1</GroupName>
-          <Files>
-            <File>
-              <FileName>graphics_generator.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\graphics_generator.c</FilePath>
-            </File>
-            <File>
-              <FileName>SAM4S4B.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\SAM4S4B_lab7\SAM4S4B.h</FilePath>
-            </File>
-            <File>
-              <FileName>SAM4S4B_adc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\SAM4S4B_lab7\SAM4S4B_adc.h</FilePath>
-            </File>
-            <File>
-              <FileName>SAM4S4B_pio.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\SAM4S4B_lab7\SAM4S4B_pio.h</FilePath>
-            </File>
-            <File>
-              <FileName>SAM4S4B_pmc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\SAM4S4B_lab7\SAM4S4B_pmc.h</FilePath>
-            </File>
-            <File>
-              <FileName>SAM4S4B_pwm.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\SAM4S4B_lab7\SAM4S4B_pwm.h</FilePath>
-            </File>
-            <File>
-              <FileName>SAM4S4B_rtc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\SAM4S4B_lab7\SAM4S4B_rtc.h</FilePath>
-            </File>
-            <File>
-              <FileName>SAM4S4B_spi.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\SAM4S4B_lab7\SAM4S4B_spi.h</FilePath>
-            </File>
-            <File>
-              <FileName>SAM4S4B_sys.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\SAM4S4B_lab7\SAM4S4B_sys.h</FilePath>
-            </File>
-            <File>
-              <FileName>SAM4S4B_tc.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\SAM4S4B_lab7\SAM4S4B_tc.h</FilePath>
-            </File>
-            <File>
-              <FileName>SAM4S4B_uart.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\SAM4S4B_lab7\SAM4S4B_uart.h</FilePath>
-            </File>
-            <File>
-              <FileName>SAM4S4B_wdt.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\SAM4S4B_lab7\SAM4S4B_wdt.h</FilePath>
-            </File>
-          </Files>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>

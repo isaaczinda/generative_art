@@ -19,8 +19,8 @@ module strip_controller_testbench();
   logic [7:0]  inputs[1000:0];
   logic [1:0]  testvectors[1000:0];
 
-  // 25 LEDs long
-  strip_controller #(25) dut(clk, reset, write_en, flush, write_data, write_addr, flushing, data_out); 
+  // 1/3 of an LED long
+  strip_controller #(1) dut(clk, reset, write_en, flush, write_data, write_addr, flushing, data_out); 
   
   // generate clock
   always 
@@ -33,7 +33,7 @@ module strip_controller_testbench();
   initial
     begin
 		state = LOADING;
-		vectors_length = 51;
+		vectors_length = 466;
 		inputs_length = 1;
 		
 		$readmemb("strip_controller.tv", testvectors);

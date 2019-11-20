@@ -1,0 +1,51 @@
+00 // set cs low
+10//First send strip number 0
+10
+10
+10
+10
+10
+10
+10
+10//Then send offset 0
+10
+10
+10
+10
+10
+10
+10
+11 //First data byte
+10
+11
+10
+11
+10
+11
+10
+11 //Second data byte
+11
+10
+10
+11
+11
+10
+10
+11//Third data byte
+11
+11
+11
+10
+10
+10
+10
+00 // set cs low to end write
+10 // Write 70, which is 'F' in ascii
+11
+10
+10
+10
+11
+11
+10
+00

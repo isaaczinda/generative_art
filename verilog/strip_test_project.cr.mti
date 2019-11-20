@@ -1,0 +1,8 @@
+C:/Users/ogillespie/Documents/verilog/testbench.sv {1 {vlog -work work -sv -stats=none C:/Users/ogillespie/Documents/verilog/testbench.sv
+Model Technology ModelSim ALTERA vlog 10.4d Compiler 2015.12 Dec 30 2015
+-- Compiling module strip_controller_testbench
+
+Top level modules:
+	strip_controller_testbench
+
+} {} {}}

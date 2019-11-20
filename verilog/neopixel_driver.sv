@@ -1,15 +1,92 @@
-module neopixel_driver(input logic clk, reset, sclk, mosi, cs,
+module neopixel_driver #(parameter STRIP_LENGTH)
+					(input logic clk, reset, sclk, mosi, cs,
 					 output logic [23:0] pixels,
 					 output logic flushing);
 					 
 	logic flush, write_en;
-	logic [7:0] write_data;
-	logic [7:0] write_addr;
+	logic [7:0] write_data, write_addr;
+	logic [4:0] strip_num;
 	
 	
-	spi spi(sclk, mosi, cs, flush, write_en, write_data, write_addr);
+	spi spi(sclk, mosi, cs, flush, write_en, write_data, write_addr, strip_num);
 	
-	strip_controller #(25) strip_controller1(clk, reset, write_en, flush, write_data, write_addr, flushing, pixels[0]);
+	logic [23:0] byte_flushing;
+	assign flushing = & byte_flushing;
+	logic write_en_0,
+			write_en_1,
+			write_en_2,
+			write_en_3,
+			write_en_4,
+			write_en_5,
+			write_en_6,
+			write_en_7,
+			write_en_8,
+			write_en_9,
+			write_en_10,
+			write_en_11,
+			write_en_12,
+			write_en_13,
+			write_en_14,
+			write_en_15,
+			write_en_16,
+			write_en_17,
+			write_en_18,
+			write_en_19,
+			write_en_20,
+			write_en_21,
+			write_en_22,
+			write_en_23;
+			
+	assign write_en_0 = (strip_num == 5'd0) ? write_en : 1'b0;
+	assign write_en_1 = (strip_num == 5'd1) ? write_en : 1'b0;
+	assign write_en_2 = (strip_num == 5'd2) ? write_en : 1'b0;
+	assign write_en_3 = (strip_num == 5'd3) ? write_en : 1'b0;
+	assign write_en_4 = (strip_num == 5'd4) ? write_en : 1'b0;
+	assign write_en_5 = (strip_num == 5'd5) ? write_en : 1'b0;
+	assign write_en_6 = (strip_num == 5'd6) ? write_en : 1'b0;
+	assign write_en_7 = (strip_num == 5'd7) ? write_en : 1'b0;
+	assign write_en_8 = (strip_num == 5'd8) ? write_en : 1'b0;
+	assign write_en_9 = (strip_num == 5'd9) ? write_en : 1'b0;
+	assign write_en_10 = (strip_num == 5'd10) ? write_en : 1'b0;
+	assign write_en_11 = (strip_num == 5'd11) ? write_en : 1'b0;
+	assign write_en_12 = (strip_num == 5'd12) ? write_en : 1'b0;
+	assign write_en_13 = (strip_num == 5'd13) ? write_en : 1'b0;
+	assign write_en_14 = (strip_num == 5'd14) ? write_en : 1'b0;
+	assign write_en_15 = (strip_num == 5'd15) ? write_en : 1'b0;
+	assign write_en_16 = (strip_num == 5'd16) ? write_en : 1'b0;
+	assign write_en_17 = (strip_num == 5'd17) ? write_en : 1'b0;
+	assign write_en_18 = (strip_num == 5'd18) ? write_en : 1'b0;
+	assign write_en_19 = (strip_num == 5'd19) ? write_en : 1'b0;
+	assign write_en_20 = (strip_num == 5'd20) ? write_en : 1'b0;
+	assign write_en_21 = (strip_num == 5'd21) ? write_en : 1'b0;
+	assign write_en_22 = (strip_num == 5'd22) ? write_en : 1'b0;
+	assign write_en_23 = (strip_num == 5'd23) ? write_en : 1'b0;
+
+	strip_controller #(STRIP_LENGTH) strip_controller0(clk, reset, write_en_0, flush, write_data, write_addr, byte_flushing[0], pixels[0]);	
+	strip_controller #(STRIP_LENGTH) strip_controller1(clk, reset, write_en_1, flush, write_data, write_addr, byte_flushing[1], pixels[1]);
+	strip_controller #(STRIP_LENGTH) strip_controller2(clk, reset, write_en_2, flush, write_data, write_addr, byte_flushing[2], pixels[2]);
+	strip_controller #(STRIP_LENGTH) strip_controller3(clk, reset, write_en_3, flush, write_data, write_addr, byte_flushing[3], pixels[3]);
+	strip_controller #(STRIP_LENGTH) strip_controller4(clk, reset, write_en_4, flush, write_data, write_addr, byte_flushing[4], pixels[4]);
+	strip_controller #(STRIP_LENGTH) strip_controller5(clk, reset, write_en_5, flush, write_data, write_addr, byte_flushing[5], pixels[5]);
+	strip_controller #(STRIP_LENGTH) strip_controller6(clk, reset, write_en_6, flush, write_data, write_addr, byte_flushing[6], pixels[6]);
+	strip_controller #(STRIP_LENGTH) strip_controller7(clk, reset, write_en_7, flush, write_data, write_addr, byte_flushing[7], pixels[7]);
+	strip_controller #(STRIP_LENGTH) strip_controller8(clk, reset, write_en_8, flush, write_data, write_addr, byte_flushing[8], pixels[8]);
+	strip_controller #(STRIP_LENGTH) strip_controller9(clk, reset, write_en_9, flush, write_data, write_addr, byte_flushing[9], pixels[9]);
+	strip_controller #(STRIP_LENGTH) strip_controller10(clk, reset, write_en_10, flush, write_data, write_addr, byte_flushing[10], pixels[10]);
+	strip_controller #(STRIP_LENGTH) strip_controller11(clk, reset, write_en_11, flush, write_data, write_addr, byte_flushing[11], pixels[11]);
+	strip_controller #(STRIP_LENGTH) strip_controller12(clk, reset, write_en_12, flush, write_data, write_addr, byte_flushing[12], pixels[12]);
+	strip_controller #(STRIP_LENGTH) strip_controller13(clk, reset, write_en_13, flush, write_data, write_addr, byte_flushing[13], pixels[13]);
+	strip_controller #(STRIP_LENGTH) strip_controller14(clk, reset, write_en_14, flush, write_data, write_addr, byte_flushing[14], pixels[14]);
+	strip_controller #(STRIP_LENGTH) strip_controller15(clk, reset, write_en_15, flush, write_data, write_addr, byte_flushing[15], pixels[15]);
+	strip_controller #(STRIP_LENGTH) strip_controller16(clk, reset, write_en_16, flush, write_data, write_addr, byte_flushing[16], pixels[16]);
+	strip_controller #(STRIP_LENGTH) strip_controller17(clk, reset, write_en_17, flush, write_data, write_addr, byte_flushing[17], pixels[17]);
+	strip_controller #(STRIP_LENGTH) strip_controller18(clk, reset, write_en_18, flush, write_data, write_addr, byte_flushing[18], pixels[18]);
+	strip_controller #(STRIP_LENGTH) strip_controller19(clk, reset, write_en_19, flush, write_data, write_addr, byte_flushing[19], pixels[19]);
+	strip_controller #(STRIP_LENGTH) strip_controller20(clk, reset, write_en_20, flush, write_data, write_addr, byte_flushing[20], pixels[20]);
+	strip_controller #(STRIP_LENGTH) strip_controller21(clk, reset, write_en_21, flush, write_data, write_addr, byte_flushing[21], pixels[21]);
+	strip_controller #(STRIP_LENGTH) strip_controller22(clk, reset, write_en_22, flush, write_data, write_addr, byte_flushing[22], pixels[22]);
+	strip_controller #(STRIP_LENGTH) strip_controller23(clk, reset, write_en_23, flush, write_data, write_addr, byte_flushing[23], pixels[23]);
+
 
 	
 endmodule
@@ -138,30 +215,29 @@ module byte_transmitter (input logic clk, reset, start,
 			WRITING_START:
 				begin
 					store_byte = 1'b0;
-						
-					// if we've written all of the bits out
-					if (counter == 3'b111) begin
-							next_state = WAITING;
-							next_counter = 3'bxxx;
-							bit_in = 1'bx;
-							bit_start = 1'b0;
-						end
-					else begin
-							next_state = WRITING_BLOCK;
-							next_counter = counter;
-							bit_in = byte_read[counter];
-							bit_start = 1'b1;
-						end
+					next_state = WRITING_BLOCK;
+					next_counter = counter;
+					bit_in = byte_read[counter];
+					bit_start = 1'b1;
 				end
 			
 			WRITING_BLOCK:
 				// if the bit controller finished writing its bit
 				if (bit_done) begin
-						store_byte = 1'b0;
-						next_state = WRITING_START;
-						next_counter = counter + 3'b001;
-						bit_in = 1'bx; // no need to set this valid here
-						bit_start = 1'b1;
+						if (counter == 3'b111) begin
+								store_byte = 1'b0;
+								next_state = WAITING;
+								next_counter = 3'bxxx;
+								bit_in = 1'bx;
+								bit_start = 1'b0;
+							end
+						else begin
+								store_byte = 1'b0;
+								next_state = WRITING_START;
+								next_counter = counter + 3'b001;
+								bit_in = 1'bx; // no need to set this valid here
+								bit_start = 1'b1;
+							end
 					end
 				// if the bit controller is still writing its bit
 				else begin
@@ -233,25 +309,25 @@ module strip_controller #(parameter STRIP_LENGTH)
 					end
 			FLUSHING_START:
 				begin
-					if (read_addr == (STRIP_LENGTH)) begin
-							next_state = WAITING;
-							next_read_addr = 8'hxx;
-							next_byte_start = 1'b0;
-							next_waiting_counter = 11'b0;
-						end
-					else begin
-							next_state = FLUSHING_BLOCK;
-							next_read_addr = read_addr;
-							next_byte_start = 1'b0;
-							next_waiting_counter = 11'bx;
-						end
+					next_state = FLUSHING_BLOCK;
+					next_read_addr = read_addr;
+					next_byte_start = 1'b0;
+					next_waiting_counter = 11'bx;
 				end
 			FLUSHING_BLOCK:
 				if(byte_done) begin
-						next_state = FLUSHING_START;
-						next_read_addr = read_addr + 8'h01;;
-						next_byte_start = 1'b1;
-						next_waiting_counter = 11'bx;
+						if (read_addr == (STRIP_LENGTH - 1)) begin
+								next_state = WAITING;
+								next_read_addr = 8'hxx;
+								next_byte_start = 1'b0;
+								next_waiting_counter = 11'b0;
+							end
+						else begin
+							next_state = FLUSHING_START;
+							next_read_addr = read_addr + 8'h01;;
+							next_byte_start = 1'b1;
+							next_waiting_counter = 11'bx;
+							end
 					end
 				else begin
 						next_state = FLUSHING_BLOCK;
@@ -295,23 +371,22 @@ module spi(input logic sclk, mosi, cs,
 				  
 	always_ff @(posedge sclk)
 		byte_read <= {byte_read[6:0], mosi};
+		
+	assign write_data = byte_read;
 	
 	
-	spi_controller(sclk, cs, byte_read, strip_num_en, offset_en, write_en, offset_incr, flush);
+	spi_controller spi_controller1(sclk, cs, byte_read, strip_num_en, offset_en, write_en, offset_incr, flush);
 	
 	
 	always_ff @(posedge sclk) 
 		if (strip_num_en) strip_num <= byte_read[4:0];
 	
-	
-	logic [7:0] offset;
-	
 	// offset holds the offset from the address pointer 
 	// where we will write data
 	always_ff @(posedge sclk) 
 		if (offset_en) begin
-				if (offset_incr) offset <= offset + 8'b1;
-				else offset <= byte_read;
+				if (offset_incr) write_offset <= write_offset + 8'b1;
+				else write_offset <= byte_read;
 			end
 	
 	
@@ -324,20 +399,22 @@ module spi_controller(input logic sclk, cs,
 							 output logic strip_num_en, offset_en, write_en, offset_incr, flush);
 							 
 	logic [2:0] byte_counter;
-	logic byte_done;
+	logic byte_done, next_byte_done;
 	
 	typedef enum logic [1:0] {RESET, FLUSH, READ_OFFSET, READ_DATA} statetype;
 	statetype state, next_state;
 	
-	assign byte_done = (byte_counter == 3'd7);
+	assign next_byte_done = (byte_counter == 3'd7);
 	
 	always_ff @(posedge sclk)
 		if (cs) byte_counter <= byte_counter + 3'b1;
 		else byte_counter <= 3'b000;
 
 	always_ff @(posedge sclk)
-		if (cs && byte_done) state <= next_state;
-		else state <= RESET;	
+		if (cs) state <= next_state;
+		else state <= RESET;
+	always_ff @(posedge sclk)
+		byte_done <= next_byte_done;
 	
 	
 	always_comb
@@ -348,7 +425,7 @@ module spi_controller(input logic sclk, cs,
 						 else next_state = RESET;
 				READ_OFFSET: next_state = READ_DATA;
 				READ_DATA: next_state = READ_DATA;
-				default: next_state = RESET;
+				FLUSH: next_state = RESET;
 			endcase
 		
 		else
@@ -359,45 +436,45 @@ module spi_controller(input logic sclk, cs,
 			case (next_state)
 			
 				RESET: begin
-						strip_num_en = 0;
-						offset_en = 0;
-						write_en = 0;
-						offset_incr = 0;
-						flush = 0;
+						strip_num_en = 1'b0;
+						offset_en = 1'b0;
+						write_en = 1'b0;
+						offset_incr = 1'b0;
+						flush = 1'b0;
 					end
 					
 				FLUSH: begin
-						strip_num_en = 0;
-						offset_en = 0;
-						write_en = 0;
-						offset_incr = 0;
-						flush = 1;
+						strip_num_en = 1'b0;
+						offset_en = 1'b0;
+						write_en = 1'b0;
+						offset_incr = 1'b0;
+						flush = 1'b1;
 					end
 				
 				READ_OFFSET: begin
-						strip_num_en = 1;
-						offset_en = 0;
-						write_en = 0;
-						offset_incr = 0;
-						flush = 0;
+						strip_num_en = 1'b1;
+						offset_en = 1'b0;
+						write_en = 1'b0;
+						offset_incr = 1'b0;
+						flush = 1'b0;
 					end
 				
 				READ_DATA: begin
 						// if we are moving from READ_OFFSET --> READ_DATA
 						// we want to save the offset in a register
 						if (state == READ_OFFSET) begin 
-								strip_num_en = 0;
-								offset_en = 1;
-								write_en = 0;
-								offset_incr = 0;
-								flush = 0;
+								strip_num_en = 1'b0;
+								offset_en = 1'b1;
+								write_en = 1'b0;
+								offset_incr = 1'b0;
+								flush = 1'b0;
 							end 
 						else begin
-								strip_num_en = 0;
-								offset_en = 1;
-								write_en = 1;
-								offset_incr = 1;
-								flush = 0;
+								strip_num_en = 1'b0;
+								offset_en = 1'b1;
+								write_en = 1'b1;
+								offset_incr = 1'b1;
+								flush = 1'b0;
 							end				
 					end
 				
@@ -411,11 +488,11 @@ module spi_controller(input logic sclk, cs,
 				endcase
 			
 		else begin
-				strip_num_en = 0;
-				offset_en = 0;
-				write_en = 0;
-				offset_incr = 0;
-				flush = 0;
+				strip_num_en = 1'b0;
+				offset_en = 1'b0;
+				write_en = 1'b0;
+				offset_incr = 1'b0;
+				flush = 1'b0;
 			end
 	end				 
 endmodule

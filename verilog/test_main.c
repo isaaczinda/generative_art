@@ -1,19 +1,10 @@
-////////////////////////////////////////////////
-// #includes
-////////////////////////////////////////////////
-
-// #include "SAM4S4B.h"
-
-// #include <stdio.h>
-// #include <stdlib.h>
-#include <math.h>
 #include "SAM4S4B_lab7\SAM4S4B.h"
+#include <math.h>
 
-// number of cols
 #define WIDTH 2
 
 // number of rows
-#define HEIGHT 1
+#define HEIGHT 2
 
 #define PIXEL_SIZE 3
 
@@ -23,8 +14,8 @@
 
 #define FLASH_CONSTANT 70 // 0b01000110
 
-#define FLUSHING_PIN PIO_PA27
-#define CS_PIN PIO_PA28
+#define FLUSHING_PIN PIO_PB11
+#define CS_PIN PIO_PB10
 
 typedef unsigned char byte;
 
@@ -39,51 +30,16 @@ void send_frame(byte[HEIGHT][WIDTH][PIXEL_SIZE]);
 void clear_frame(byte[HEIGHT][WIDTH][PIXEL_SIZE]);
 void draw_circle(byte[HEIGHT][WIDTH][PIXEL_SIZE], double, int, int, int, color);
 
-void static_circles(byte screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
-  for (int i = 0; i < 1000; i++) {
-    int r1 = i % 37;
-    int r2 = i % 29;
-    int r3 = i % 47;
-    int r4 = i % 23;
-    int r5 = i % 17;
-
-    color c1 = { 255, (i-100)%256, 0, 255 };
-    color c2 = { 0, 255, i%256, 255 };
-    color c3 = { (i+200)%256, 0, 255, 255 };
-    color c4 = { 255, (i+100)%256, 0, 255 };
-    color c5 = { 0, 255, (i+200)%256, 255 };
-
-    clear_frame(screen);
-    draw_circle(screen, r1, 200, 2, 2, c1);
-    draw_circle(screen, r1 + 1, 200, 2, 2, c1);
-
-    draw_circle(screen, r2, 100, 6, 12, c2);
-    draw_circle(screen, r2 + 4, 100, 6, 12, c2);
-
-    draw_circle(screen, r3, 100, 15, 22, c3);
-    draw_circle(screen, r3+1, 100, 15, 22, c3);
-    draw_circle(screen, r3+2, 100, 15, 22, c3);
-
-    draw_circle(screen, r4, 100, 23, 6, c4);
-
-    draw_circle(screen, r5, 100, 13, 17, c5);
-		send_frame(screen);
-  }
-}
-
 int main() {
-	
 	samInit();
-  pioInit();
-  spiInit(MCK_FREQ/244000, 0, 1);
-	pioPinMode(CS_PIN, PIO_OUTPUT);
-	pioPinMode(FLUSHING_PIN, PIO_INPUT);
+	pioInit();
+	spiInit(MCK_FREQ/244000, 0, 1);
+	pioPinMode(CS_PIN, PIO_INPUT);
+	pioPinMode(FLUSHING_PIN, PIO_OUTPUT);
 	
-  byte screen[HEIGHT][WIDTH][PIXEL_SIZE];
-
-  static_circles(screen);
+	byte screen[HEIGHT][WIDTH][PIXEL_SIZE];
+	send_frame(screen);
 }
-
 
 // mode = 1: opaque
 // mode = 0: transparent
@@ -117,7 +73,7 @@ void clear_frame(byte screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
     for (int y = 0; y < HEIGHT; y++) {
       screen[y][x][RED] = 0;
       screen[y][x][GREEN] = 0;
-      screen[y][x][BLUE] = 100;
+      screen[y][x][BLUE] = 0;
     }
   }
 }
@@ -145,7 +101,6 @@ void flush(){
 void send_strip(byte strip_number, byte strip_data[WIDTH][PIXEL_SIZE]){
   set_cs_high();
   spi_send_byte(strip_number); // Start by sending strip number
-	spi_send_byte(0); // 0 offset
   for (int w = 0; w < WIDTH; w++) {
     for (int p = 0; p < PIXEL_SIZE; p++){
       spi_send_byte(strip_data[w][p]); // send all of the data from the strip using "burst mode"

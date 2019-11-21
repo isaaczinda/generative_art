@@ -39,6 +39,7 @@
 10
 10
 10
+10 // hold cs high
 00 // set cs low to end write
 10 // Write 70, which is 'F' in ascii
 11
@@ -48,4 +49,5 @@
 11
 11
 10
+10 // hold cs high one more cycle
 00

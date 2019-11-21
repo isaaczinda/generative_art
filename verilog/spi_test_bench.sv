@@ -23,7 +23,7 @@ module testbench();
         
     initial begin
 		vectors_length = 24;
-		inputs_length = 51;
+		inputs_length = 53;
 		
 		$readmemb("spi_to_pixels_vectors.tv", testvectors);
       vector_index = 0;

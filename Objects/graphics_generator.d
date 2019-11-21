@@ -1,0 +1,14 @@
+.\objects\graphics_generator.o: graphics_generator.c
+.\objects\graphics_generator.o: f:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+.\objects\graphics_generator.o: SAM4S4B_libs\SAM4S4B.h
+.\objects\graphics_generator.o: SAM4S4B_libs\SAM4S4B_sys.h
+.\objects\graphics_generator.o: SAM4S4B_libs\SAM4S4B_pmc.h
+.\objects\graphics_generator.o: f:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\objects\graphics_generator.o: SAM4S4B_libs\SAM4S4B_pio.h
+.\objects\graphics_generator.o: SAM4S4B_libs\SAM4S4B_tc.h
+.\objects\graphics_generator.o: SAM4S4B_libs\SAM4S4B_uart.h
+.\objects\graphics_generator.o: SAM4S4B_libs\SAM4S4B_pwm.h
+.\objects\graphics_generator.o: SAM4S4B_libs\SAM4S4B_rtc.h
+.\objects\graphics_generator.o: SAM4S4B_libs\SAM4S4B_wdt.h
+.\objects\graphics_generator.o: SAM4S4B_libs\SAM4S4B_spi.h
+.\objects\graphics_generator.o: SAM4S4B_libs\SAM4S4B_adc.h

@@ -1,20 +1,29 @@
 module top (input logic clk, reset, sclk, mosi, cs,
 					 output logic [23:0] pixels,
-					 output logic flushing);
-	neopixel_driver #(25) neopixel_driver1(clk, reset, sclk, mosi, cs, pixels, flushing);
+					 output logic flushing, p49, p50, p51, p52);
+					 
+	neopixel_driver #(75) neopixel_driver1(clk, reset, sclk, mosi, cs, pixels, flushing, p49, p50);
 endmodule
 
 module neopixel_driver #(parameter STRIP_LENGTH)
 					(input logic clk, reset, sclk, mosi, cs,
 					 output logic [23:0] pixels,
-					 output logic flushing);
+					 output logic flushing, p49, p50);
 					 
 	logic flush, write_en;
 	logic [7:0] write_data, write_addr;
 	logic [4:0] strip_num;
+//	logic p49, p50;
 	
 	
-	spi spi(sclk, mosi, cs, flush, write_en, write_data, write_addr, strip_num);
+//	module spi(input logic clk, sclk, mosi, cs,
+//			  output logic flush, write_en, 
+//			  output logic [7:0] write_data,
+//			  output logic [7:0] write_offset,
+//			  output logic [4:0] strip_num,
+//			  output logic p49, p50);
+	
+	spi spi(clk, sclk, mosi, cs, flush, write_en, write_data, write_addr, strip_num, p49, p50);
 	
 	logic [23:0] byte_flushing;
 	assign flushing = & byte_flushing;
@@ -365,63 +374,90 @@ endmodule
 						  
 			  
 
-module spi(input logic sclk, mosi, cs,
+module spi(input logic clk, sclk, mosi, cs,
 			  output logic flush, write_en, 
 			  output logic [7:0] write_data,
 			  output logic [7:0] write_offset,
-			  output logic [4:0] strip_num);
+			  output logic [4:0] strip_num,
+			  output logic p49, p50);
 
 	logic [7:0] byte_read;
-	logic strip_num_en, offset_en, offset_incr;
+	logic strip_num_en, offset_en, offset_incr, byte_done, gated_cs;
 	
-				  
-	always_ff @(posedge sclk)
-		byte_read <= {byte_read[6:0], mosi};
-		
+	
+	// this outputs everything in the clk clock domain
+	// it outputs byte_read, which is the byte read, and raises
+	// new_byte for 1 cycle after byte_read becomes valid
+	
+	// TODO: gated cs is very hakcy, fix this ;)
+	spi_byte_reader spi_byte_reader1(clk, sclk, cs, mosi, byte_done, gated_cs, byte_read);
+	
 	assign write_data = byte_read;
 	
+	spi_controller spi_controller1(clk, gated_cs, byte_done, byte_read, strip_num_en, offset_en, write_en, offset_incr, flush, p49, p50);
 	
-	spi_controller spi_controller1(sclk, cs, byte_read, strip_num_en, offset_en, write_en, offset_incr, flush);
 	
-	
-	always_ff @(posedge sclk) 
+	always_ff @(posedge clk) 
 		if (strip_num_en) strip_num <= byte_read[4:0];
 	
 	// offset holds the offset from the address pointer 
 	// where we will write data
-	always_ff @(posedge sclk) 
+	always_ff @(posedge clk) 
 		if (offset_en) begin
 				if (offset_incr) write_offset <= write_offset + 8'b1;
 				else write_offset <= byte_read;
 			end
-	
-	
-	
-			  
 endmodule
 
-module spi_controller(input logic sclk, cs,
+// all outputs are synchronized to clk
+module spi_byte_reader(input logic clk,
+							  input logic sclk, cs, mosi,
+							  output logic byte_done, gated_cs,
+							  output logic [7:0] byte_read);
+  
+	logic [7:0] sclk_byte_read;
+	logic [2:0] sclk_bit_counter;
+	
+  
+  
+	always_ff @(posedge sclk)
+		if (cs) begin 
+				sclk_byte_read <= {sclk_byte_read[6:0], mosi};
+				sclk_bit_counter <= sclk_bit_counter + 3'd1;
+			end
+		else begin 
+				sclk_byte_read <= 8'h00;
+				sclk_bit_counter <= 3'd0;
+			end
+	
+	logic [2:0] bit_counter, previous_bit_counter;
+
+	always_ff @(posedge clk) begin
+			byte_read <= sclk_byte_read;
+			bit_counter <= sclk_bit_counter;
+			previous_bit_counter <= bit_counter;
+			gated_cs <= cs;
+		end
+	
+	
+	// when bit counter goes from 7 --> 0, make a pulse
+	assign byte_done = (previous_bit_counter == 3'd7 && bit_counter == 3'd0);
+endmodule
+
+module spi_controller(input logic clk, cs, byte_done,
 							 input logic [7:0] byte_read,
-							 output logic strip_num_en, offset_en, write_en, offset_incr, flush);
-							 
-	logic [2:0] byte_counter;
-	logic byte_done, next_byte_done;
+							 output logic strip_num_en, offset_en, write_en, offset_incr, flush, p49, p50);
 	
 	typedef enum logic [1:0] {RESET, FLUSH, READ_OFFSET, READ_DATA} statetype;
 	statetype state, next_state;
 	
-	assign next_byte_done = (byte_counter == 3'd7);
+	assign p49 = state[0];
+	assign p50 = state[1];
 	
-	always_ff @(posedge sclk)
-		if (cs) byte_counter <= byte_counter + 3'b1;
-		else byte_counter <= 3'b000;
-
-	always_ff @(posedge sclk)
+	
+	always_ff @(posedge clk)
 		if (cs) state <= next_state;
 		else state <= RESET;
-	always_ff @(posedge sclk)
-		byte_done <= next_byte_done;
-	
 	
 	always_comb
 		if (byte_done)

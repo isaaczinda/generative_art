@@ -2,15 +2,14 @@
 // #includes
 ////////////////////////////////////////////////
 
-// #include "SAM4S4B.h"
 
 // #include <stdio.h>
 // #include <stdlib.h>
 #include <math.h>
-#include "SAM4S4B_lab7\SAM4S4B.h"
+#include "SAM4S4B_libs\SAM4S4B.h"
 
 // number of cols
-#define WIDTH 2
+#define WIDTH 25
 
 // number of rows
 #define HEIGHT 1
@@ -68,6 +67,9 @@ void static_circles(byte screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
 
     draw_circle(screen, r5, 100, 13, 17, c5);
 		send_frame(screen);
+		if (i == 999){
+			i = 0;
+		}
   }
 }
 

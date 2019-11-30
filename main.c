@@ -33,8 +33,41 @@ void render_frame(byte[HEIGHT][WIDTH][PIXEL_SIZE]);
 void send_frame(byte[HEIGHT][WIDTH][PIXEL_SIZE]);
 void clear_frame(byte[HEIGHT][WIDTH][PIXEL_SIZE]);
 void draw_circle(byte[HEIGHT][WIDTH][PIXEL_SIZE], double, int, int, int, color);
+void draw_background(byte[HEIGHT][WIDTH][PIXEL_SIZE], double, double, double, double, color);
 
 #include "archive.h"
+
+void shifting_background(byte screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
+  for (int i = 0; i < 1000; i++) {
+    clear_frame(screen);
+
+    // frequency ranges from from .05 to .15
+    double freq_x_1 = .05 * sin(2 * M_PI * i * .0245) + .08;
+    double freq_y_1 = .05 * sin(2 * M_PI * i * .0394) + .08;
+
+    double offset_x_1 = 1.4 * sin(2 * M_PI * i * .0494);
+    double offset_y_1 = .8 * sin(2 * M_PI * i * .0394);
+
+
+    double freq_x_2 = .05 * sin(2 * M_PI * i * .00245) + .08;
+    double freq_y_2 = .05 * sin(2 * M_PI * i * .01345) + .08;
+
+    double offset_x_2 = 1.2 * sin(2 * M_PI * i * .0294);
+    double offset_y_2 = .4 * sin(2 * M_PI * i * .0194);
+
+
+    draw_background(screen, freq_x_1, freq_y_1, offset_x_1, offset_y_1, (color){255, 0, 255, 255});
+    draw_background(screen, freq_x_2, freq_y_2, offset_x_2, offset_y_2, (color){0, 150, 255, 100});
+    draw_background(screen, freq_y_2, freq_x_1 * .9, offset_y_2, offset_x_1, (color){0, 50, 255, 70});
+
+    if(RENDERING){
+      render_frame(screen);
+    }
+    if(SPI_ON){
+      send_frame(screen);
+    }
+  }
+}
 
 void static_circles(byte screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
   for (int i = 0; i < 1000; i++) {
@@ -51,19 +84,18 @@ void static_circles(byte screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
     color c5 = { 0, 255, (i+200)%256, 255 };
 
     clear_frame(screen);
+
     draw_circle(screen, r1, 200, 2, 2, c1);
     draw_circle(screen, r1 + 1, 200, 2, 2, c1);
 
-    draw_circle(screen, r2, 100, 6, 12, c2);
-    draw_circle(screen, r2 + 4, 100, 6, 12, c2);
+    draw_circle(screen, r2, 400, 6, 12, c2);
+    draw_circle(screen, r2 + 4, 400, 6, 12, c2);
 
-    draw_circle(screen, r3, 100, 15, 22, c3);
-    draw_circle(screen, r3+1, 100, 15, 22, c3);
-    draw_circle(screen, r3+2, 100, 15, 22, c3);
+    draw_circle(screen, r3, 400, 15, 22, c3);
 
-    draw_circle(screen, r4, 100, 23, 6, c4);
+    draw_circle(screen, r4, 400, 23, 6, c4);
+    draw_circle(screen, r5, 400, 13, 17, c5);
 
-    draw_circle(screen, r5, 100, 13, 17, c5);
     if(RENDERING){
       render_frame(screen);
     }
@@ -76,9 +108,24 @@ void static_circles(byte screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
 int main() {
   byte screen[HEIGHT][WIDTH][PIXEL_SIZE];
 
-  static_circles(screen);
+  shifting_background(screen);
 }
 
+void draw_background(byte screen[HEIGHT][WIDTH][PIXEL_SIZE], double freq_x, double freq_y, double offset_x, double offset_y, color bg_color) {
+    double opacity = bg_color.alpha / 255.0;
+
+    for (int x = 0; x < WIDTH; x++) {
+        for (int y = 0; y < HEIGHT; y++) {
+
+            // from 0 to 1
+            double brightness = (( sin(x * 2 * M_PI * freq_x - offset_x) * cos(y * 2 * M_PI * freq_y - offset_y) ) / 2.0) + .5;
+
+            screen[y][x][RED] = (1-opacity) * screen[y][x][RED] + opacity *  brightness * bg_color.red;
+            screen[y][x][BLUE] = (1-opacity) * screen[y][x][BLUE] + opacity * brightness * bg_color.blue;
+            screen[y][x][GREEN] = (1-opacity) * screen[y][x][GREEN] + opacity * brightness * bg_color.green;
+        }
+    }
+}
 
 // mode = 1: opaque
 // mode = 0: transparent

@@ -12,7 +12,7 @@
 #define WIDTH 25
 
 // number of rows
-#define HEIGHT 1
+#define HEIGHT 4
 
 #define PIXEL_SIZE 3
 

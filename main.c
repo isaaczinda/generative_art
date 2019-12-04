@@ -20,6 +20,10 @@
 #define RENDERING 1 // outputs frame to local files when non-zero
 #define SPI_ON 0 // outputs frame to strips over SPI when non-zero
 
+#define FALSE 0
+#define TRUE 1
+
+
 typedef unsigned char byte;
 
 typedef struct {
@@ -35,7 +39,102 @@ void clear_frame(byte[HEIGHT][WIDTH][PIXEL_SIZE]);
 void draw_circle(byte[HEIGHT][WIDTH][PIXEL_SIZE], double, int, int, int, color);
 void draw_background(byte[HEIGHT][WIDTH][PIXEL_SIZE], double, double, double, double, color);
 
-#include "archive.h"
+typedef struct {
+    float x_pos;
+    float y_pos;
+    float x_vel;
+    float y_vel;
+    color col;
+    int active;
+} particle;
+
+
+#define NUM_PARTICLES 20
+#define FRAME_TIME .01666
+#define SPEED_FACTOR 10
+
+particle particles[NUM_PARTICLES];
+
+particle spawn_particle() {
+    float rand_x_vel = ((float)(rand() % 20) - 10) / 5.0 * SPEED_FACTOR; // from -2 to 2
+    float rand_y_vel = ((float)(rand() % 20) - 10) / 5.0 * SPEED_FACTOR; // from -2 to 2
+
+    float rand_x_pos = rand() % WIDTH;
+    float rand_y_pos = rand() % HEIGHT;
+
+    color rand_color = (color){rand() % 256, rand() % 256, rand() % 256, 255};
+
+    return (particle){rand_x_pos, rand_y_pos, // position
+        rand_x_vel, rand_y_vel,
+        rand_color, // color
+        TRUE}; // active?
+}
+
+particle get_closest_particle(float x_pos, float y_pos) {
+    particle closest_particle;
+    float closest_particle_distance = 100; // larger than max distance
+
+    for (int i = 0; i < NUM_PARTICLES; i++) {
+        float distance = sqrt(pow(x_pos - particles[i].x_pos, 2) + pow(y_pos - particles[i].y_pos, 2));
+
+        if (distance < closest_particle_distance) {
+            closest_particle_distance = distance;
+            closest_particle = particles[i];
+        }
+    }
+
+    return closest_particle;
+}
+
+void particles_animation(byte screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
+    // initialize all particles to
+    for (int s = 0; s < NUM_PARTICLES; s++) {
+        particles[s].active = FALSE;
+    }
+
+    for (int i = 0; i < 1000; i++) {
+
+        for (int s = 0; s < NUM_PARTICLES; s++) {
+            // add this particle if it has fallen off of the screen
+            if (particles[s].active == FALSE) {
+                // spawn a new particle
+                particles[s] = spawn_particle();
+            }
+
+            // move particles
+            particles[s].x_pos += particles[s].x_vel * FRAME_TIME;
+            particles[s].y_pos += particles[s].y_vel * FRAME_TIME;
+        }
+
+        // color pixels based on which particle is closest
+        for (int x = 0; x < WIDTH; x++) {
+            for (int y = 0; y < HEIGHT; y++) {
+                color pixel_color = get_closest_particle(x, y).col;
+
+                screen[y][x][RED] = pixel_color.red;
+                screen[y][x][GREEN] = pixel_color.green;
+                screen[y][x][BLUE] = pixel_color.blue;
+            }
+        }
+
+        if(RENDERING){
+          render_frame(screen);
+        }
+        if(SPI_ON){
+          send_frame(screen);
+        }
+
+        // remove particles which have fallen off of the screen
+        for (int s = 0; s < NUM_PARTICLES; s++) {
+            if (particles[s].x_pos >= WIDTH || particles[s].x_pos < 0 ||
+                particles[s].y_pos >= HEIGHT || particles[s].y_pos < 0)
+            {
+                particles[s].active = FALSE;
+
+            }
+        }
+    }
+}
 
 void shifting_background(byte screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
   for (int i = 0; i < 1000; i++) {
@@ -108,7 +207,8 @@ void static_circles(byte screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
 int main() {
   byte screen[HEIGHT][WIDTH][PIXEL_SIZE];
 
-  shifting_background(screen);
+  // shifting_background(screen);
+  particles_animation(screen);
 }
 
 void draw_background(byte screen[HEIGHT][WIDTH][PIXEL_SIZE], double freq_x, double freq_y, double offset_x, double offset_y, color bg_color) {

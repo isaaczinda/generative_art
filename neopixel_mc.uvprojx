@@ -382,11 +382,6 @@
           <GroupName>Source Group 1</GroupName>
           <Files>
             <File>
-              <FileName>graphics_generator.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\graphics_generator.c</FilePath>
-            </File>
-            <File>
               <FileName>SAM4S4B.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\SAM4S4B_libs\SAM4S4B.h</FilePath>
@@ -410,6 +405,11 @@
               <FileName>SAM4S4B_pwm.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\SAM4S4B_libs\SAM4S4B_pwm.h</FilePath>
+            </File>
+            <File>
+              <FileName>graphics_generator.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\graphics_generator.c</FilePath>
             </File>
           </Files>
         </Group>

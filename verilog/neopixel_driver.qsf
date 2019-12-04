@@ -41,7 +41,7 @@ set_global_assignment -name DEVICE EP4CE6E22C8
 set_global_assignment -name TOP_LEVEL_ENTITY top
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 18.0.0
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "15:21:24  NOVEMBER 10, 2019"
-set_global_assignment -name LAST_QUARTUS_VERSION "13.0 SP1"
+set_global_assignment -name LAST_QUARTUS_VERSION "18.0.0 Lite Edition"
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
@@ -60,8 +60,8 @@ set_location_assignment PIN_113 -to sclk
 set_location_assignment PIN_1 -to reset
 set_location_assignment PIN_2 -to pixels[0]
 set_location_assignment PIN_112 -to mosi
-set_location_assignment PIN_7 -to flushing
-set_location_assignment PIN_3 -to cs
+set_location_assignment PIN_126 -to flushing
+set_location_assignment PIN_127 -to cs
 set_location_assignment PIN_88 -to clk
 set_location_assignment PIN_49 -to p49
 set_location_assignment PIN_50 -to p50

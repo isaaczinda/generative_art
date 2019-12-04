@@ -1,27 +1,47 @@
+// outputs frame to local files when we are testing
+// outputs frame to strips over SPI when we aren't testing
+#define TESTING 0
+
+#include <math.h>
+
+
+// only include os libraries when we're testing
+#if TESTING == 1
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#endif
+
+#if TESTING == 0
+#include "SAM4S4B_libs\SAM4S4B.h"
+#endif
 
 // number of cols
 #define WIDTH 25
-
 // number of rows
 #define HEIGHT 24
 
 #define PIXEL_SIZE 3
 
+#define M_PI 3.1415
+
 #define RED 0
 #define GREEN 1
 #define BLUE 2
 
-#define FLASH_CONSTANT 170 // 0b10101010
-#define RENDERING 1 // outputs frame to local files when non-zero
-#define SPI_ON 0 // outputs frame to strips over SPI when non-zero
+#define NUM_PARTICLES 20
+#define FRAME_TIME .01666
+#define SPEED_FACTOR 10
 
-#define FALSE 0
+// to simplify boolean logic
 #define TRUE 1
+#define FALSE 0
+
+#define FLASH_CONSTANT 170 // 0b10101010
+
+#define FLUSHING_PIN PIO_PB10
+#define CS_PIN PIO_PB11
 
 
 typedef unsigned char byte;
@@ -39,101 +59,23 @@ void clear_frame(byte[HEIGHT][WIDTH][PIXEL_SIZE]);
 void draw_circle(byte[HEIGHT][WIDTH][PIXEL_SIZE], double, int, int, int, color);
 void draw_background(byte[HEIGHT][WIDTH][PIXEL_SIZE], double, double, double, double, color);
 
-typedef struct {
-    float x_pos;
-    float y_pos;
-    float x_vel;
-    float y_vel;
-    color col;
-    int active;
-} particle;
-
-
-#define NUM_PARTICLES 20
-#define FRAME_TIME .01666
-#define SPEED_FACTOR 10
-
-particle particles[NUM_PARTICLES];
-
-particle spawn_particle() {
-    float rand_x_vel = ((float)(rand() % 20) - 10) / 5.0 * SPEED_FACTOR; // from -2 to 2
-    float rand_y_vel = ((float)(rand() % 20) - 10) / 5.0 * SPEED_FACTOR; // from -2 to 2
-
-    float rand_x_pos = rand() % WIDTH;
-    float rand_y_pos = rand() % HEIGHT;
-
-    color rand_color = (color){rand() % 256, rand() % 256, rand() % 256, 255};
-
-    return (particle){rand_x_pos, rand_y_pos, // position
-        rand_x_vel, rand_y_vel,
-        rand_color, // color
-        TRUE}; // active?
-}
-
-particle get_closest_particle(float x_pos, float y_pos) {
-    particle closest_particle;
-    float closest_particle_distance = 100; // larger than max distance
-
-    for (int i = 0; i < NUM_PARTICLES; i++) {
-        float distance = sqrt(pow(x_pos - particles[i].x_pos, 2) + pow(y_pos - particles[i].y_pos, 2));
-
-        if (distance < closest_particle_distance) {
-            closest_particle_distance = distance;
-            closest_particle = particles[i];
-        }
-    }
-
-    return closest_particle;
-}
-
-void particles_animation(byte screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
-    // initialize all particles to
-    for (int s = 0; s < NUM_PARTICLES; s++) {
-        particles[s].active = FALSE;
-    }
-
-    for (int i = 0; i < 1000; i++) {
-
-        for (int s = 0; s < NUM_PARTICLES; s++) {
-            // add this particle if it has fallen off of the screen
-            if (particles[s].active == FALSE) {
-                // spawn a new particle
-                particles[s] = spawn_particle();
-            }
-
-            // move particles
-            particles[s].x_pos += particles[s].x_vel * FRAME_TIME;
-            particles[s].y_pos += particles[s].y_vel * FRAME_TIME;
-        }
-
-        // color pixels based on which particle is closest
-        for (int x = 0; x < WIDTH; x++) {
-            for (int y = 0; y < HEIGHT; y++) {
-                color pixel_color = get_closest_particle(x, y).col;
-
-                screen[y][x][RED] = pixel_color.red;
-                screen[y][x][GREEN] = pixel_color.green;
-                screen[y][x][BLUE] = pixel_color.blue;
-            }
-        }
-
-        if(RENDERING){
-          render_frame(screen);
-        }
-        if(SPI_ON){
-          send_frame(screen);
-        }
-
-        // remove particles which have fallen off of the screen
-        for (int s = 0; s < NUM_PARTICLES; s++) {
-            if (particles[s].x_pos >= WIDTH || particles[s].x_pos < 0 ||
-                particles[s].y_pos >= HEIGHT || particles[s].y_pos < 0)
-            {
-                particles[s].active = FALSE;
-
-            }
-        }
-    }
+void test_animation(byte screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
+	byte color = 0;
+	
+	while (TRUE) {
+		// color pixels based on which particle is closest
+		for (int x = 0; x < WIDTH; x++) {
+				for (int y = 0; y < HEIGHT; y++) {
+						screen[y][x][RED] = 255;
+						screen[y][x][GREEN] = 0;
+						screen[y][x][BLUE] = 0;
+				}
+		}
+		
+		color += 1;
+		
+		send_frame(screen);
+	}
 }
 
 void shifting_background(byte screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
@@ -159,12 +101,7 @@ void shifting_background(byte screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
     draw_background(screen, freq_x_2, freq_y_2, offset_x_2, offset_y_2, (color){0, 150, 255, 100});
     draw_background(screen, freq_y_2, freq_x_1 * .9, offset_y_2, offset_x_1, (color){0, 50, 255, 70});
 
-    if(RENDERING){
-      render_frame(screen);
-    }
-    if(SPI_ON){
-      send_frame(screen);
-    }
+		send_frame(screen);
   }
 }
 
@@ -195,20 +132,23 @@ void static_circles(byte screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
     draw_circle(screen, r4, 400, 23, 6, c4);
     draw_circle(screen, r5, 400, 13, 17, c5);
 
-    if(RENDERING){
-      render_frame(screen);
-    }
-    if(SPI_ON){
-      send_frame(screen);
-    }
+		send_frame(screen);
   }
 }
 
-int main() {
-  byte screen[HEIGHT][WIDTH][PIXEL_SIZE];
+byte screen[HEIGHT][WIDTH][PIXEL_SIZE];
 
+int main() {
+	#if TESTING == 0
+	samInit();
+  pioInit();
+  spiInit(MCK_FREQ/244000, 0, 1);
+	pioPinMode(CS_PIN, PIO_OUTPUT);
+	pioPinMode(FLUSHING_PIN, PIO_INPUT);
+	#endif
+	
   // shifting_background(screen);
-  particles_animation(screen);
+  static_circles(screen);
 }
 
 void draw_background(byte screen[HEIGHT][WIDTH][PIXEL_SIZE], double freq_x, double freq_y, double offset_x, double offset_y, color bg_color) {
@@ -264,18 +204,18 @@ void clear_frame(byte screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
   }
 }
 
-// TODO: replace with spi header file
 void spi_send_byte(byte data){
-  printf("SPI output: %u\n", data);
+	while (pioDigitalRead(FLUSHING_PIN)) {}
+  spiSendReceive(data);
 }
 
 // TODO: replace with gpio pin header file
 void set_cs_high(){
-  printf("CS: High\n");
+  pioDigitalWrite(CS_PIN, PIO_HIGH);
 }
 
 void set_cs_low(){
-  printf("CS: Low\n");
+  pioDigitalWrite(CS_PIN, PIO_LOW);
 }
 
 void flush(){
@@ -287,6 +227,7 @@ void flush(){
 void send_strip(byte strip_number, byte strip_data[WIDTH][PIXEL_SIZE]){
   set_cs_high();
   spi_send_byte(strip_number); // Start by sending strip number
+	spi_send_byte(0); // 0 offset
   for (int w = 0; w < WIDTH; w++) {
     for (int p = 0; p < PIXEL_SIZE; p++){
       spi_send_byte(strip_data[w][p]); // send all of the data from the strip using "burst mode"
@@ -295,15 +236,17 @@ void send_strip(byte strip_number, byte strip_data[WIDTH][PIXEL_SIZE]){
   set_cs_low();
 }
 
-
+#if TESTING == 0
 void send_frame(byte frame[HEIGHT][WIDTH][PIXEL_SIZE]){
   for (int h = 0; h < HEIGHT; h++) {
     send_strip(h,frame[h]);
   }
   flush();
 }
+#endif
 
-void render_frame(byte frame[HEIGHT][WIDTH][PIXEL_SIZE]) {
+#if TESTING == 1
+void send_frame(byte frame[HEIGHT][WIDTH][PIXEL_SIZE]) {
   static int frame_number = 0;
   char frame_name[50];
 
@@ -321,3 +264,4 @@ void render_frame(byte frame[HEIGHT][WIDTH][PIXEL_SIZE]) {
   fclose(fd);
   frame_number += 1;
 }
+#endif

@@ -22,8 +22,8 @@
 
 #define FLASH_CONSTANT 70 // 0b01000110
 
-#define FLUSHING_PIN PIO_PA27
-#define CS_PIN PIO_PA28
+#define FLUSHING_PIN PIO_PB10
+#define CS_PIN PIO_PB11
 
 typedef unsigned char byte;
 
@@ -73,7 +73,10 @@ void static_circles(byte screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
   }
 }
 
+
+
 int main() {
+	byte screen[HEIGHT][WIDTH][PIXEL_SIZE];
 	
 	samInit();
   pioInit();
@@ -81,8 +84,6 @@ int main() {
 	pioPinMode(CS_PIN, PIO_OUTPUT);
 	pioPinMode(FLUSHING_PIN, PIO_INPUT);
 	
-  byte screen[HEIGHT][WIDTH][PIXEL_SIZE];
-
   static_circles(screen);
 }
 

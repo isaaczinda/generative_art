@@ -56,9 +56,11 @@ void shifting_background(byte screen[HEIGHT][WIDTH][PIXEL_SIZE]) {
     double offset_y_2 = .4 * sin(2 * M_PI * i * .0194);
 
 
-    draw_background(screen, freq_x_1, freq_y_1, offset_x_1, offset_y_1, (color){255, 0, 255, 255});
-    draw_background(screen, freq_x_2, freq_y_2, offset_x_2, offset_y_2, (color){0, 150, 255, 100});
-    draw_background(screen, freq_y_2, freq_x_1 * .9, offset_y_2, offset_x_1, (color){0, 50, 255, 70});
+    int j = i + 77;
+    int k = i + 300;
+    draw_background(screen, freq_x_1, freq_y_1, offset_x_1, offset_y_1, (color){j % 256, (2 * j) % 256, (3 * j) % 256, 255});
+    draw_background(screen, freq_x_2, freq_y_2, offset_x_2, offset_y_2, (color){k % 256, (2 * k) % 256, (3 * k) % 256, 100});
+    draw_background(screen, freq_y_2, freq_x_1 * .9, offset_y_2, offset_x_1, (color){i % 256, (2 * i) % 256, (3 * i) % 256, 70});
 
     if(RENDERING){
       render_frame(screen);
@@ -109,6 +111,7 @@ int main() {
   byte screen[HEIGHT][WIDTH][PIXEL_SIZE];
 
   shifting_background(screen);
+  /* static_circles(screen); */
 }
 
 void draw_background(byte screen[HEIGHT][WIDTH][PIXEL_SIZE], double freq_x, double freq_y, double offset_x, double offset_y, color bg_color) {

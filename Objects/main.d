@@ -1,5 +1,7 @@
 .\objects\main.o: main.c
 .\objects\main.o: f:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+.\objects\main.o: f:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\main.o: f:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\main.o: SAM4S4B_libs\SAM4S4B.h
 .\objects\main.o: SAM4S4B_libs\SAM4S4B_sys.h
 .\objects\main.o: SAM4S4B_libs\SAM4S4B_pmc.h

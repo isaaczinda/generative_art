@@ -407,9 +407,9 @@
               <FilePath>.\SAM4S4B_libs\SAM4S4B_pwm.h</FilePath>
             </File>
             <File>
-              <FileName>graphics_generator.c</FileName>
+              <FileName>main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\graphics_generator.c</FilePath>
+              <FilePath>.\main.c</FilePath>
             </File>
           </Files>
         </Group>

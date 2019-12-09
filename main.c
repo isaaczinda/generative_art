@@ -1,6 +1,6 @@
 // outputs frame to local files when we are testing
 // outputs frame to strips over SPI when we aren't testing
-#define TESTING 0
+#define TESTING 1
 
 #include <math.h>
 #include <stdio.h>
@@ -15,7 +15,7 @@
 #endif
 
 #if TESTING == 0
-#include "SAM4S4B_libs\SAM4S4B.h"
+#include "SAM4S4B_libs/SAM4S4B.h"
 #endif
 
 // number of cols
@@ -25,7 +25,11 @@
 
 #define PIXEL_SIZE 3
 
+// need to redefine this sometimes because ATSAM's version of math.h doesn't
+// include this constant
+#ifndef M_PI
 #define M_PI 3.1415
+#endif
 
 #define RED 0
 #define GREEN 1
@@ -156,11 +160,11 @@ void test_animation() {
 	while (TRUE) {
 		// color pixels based on which particle is closest
 		for (int x = 0; x < WIDTH; x++) {
-				for (int y = 0; y < HEIGHT; y++) {
-						screen[y][x][RED] = 255;
-						screen[y][x][GREEN] = 0;
-						screen[y][x][BLUE] = 0;
-				}
+			for (int y = 0; y < HEIGHT; y++) {
+				screen[y][x][RED] = 255;
+				screen[y][x][GREEN] = 0;
+				screen[y][x][BLUE] = 0;
+			}
 		}
 
 		color += 1;
@@ -170,31 +174,31 @@ void test_animation() {
 }
 
 void shifting_background() {
-  for (int i = 0; i < 1000; i++) {
-    clear_frame();
+    for (int i = 0; i < 1000; i++) {
+        clear_frame();
 
-    // frequency ranges from from .05 to .15
-    double freq_x_1 = .05 * sin(2 * M_PI * i * .0245) + .08;
-    double freq_y_1 = .05 * sin(2 * M_PI * i * .0394) + .08;
+        // frequency ranges from from .05 to .15
+        double freq_x_1 = .05 * sin(2 * M_PI * i * .0245) + .08;
+        double freq_y_1 = .05 * sin(2 * M_PI * i * .0394) + .08;
 
-    double offset_x_1 = 1.4 * sin(2 * M_PI * i * .0494);
-    double offset_y_1 = .8 * sin(2 * M_PI * i * .0394);
-
-
-    double freq_x_2 = .05 * sin(2 * M_PI * i * .00245) + .08;
-    double freq_y_2 = .05 * sin(2 * M_PI * i * .01345) + .08;
-
-    double offset_x_2 = 1.2 * sin(2 * M_PI * i * .0294);
-    double offset_y_2 = .4 * sin(2 * M_PI * i * .0194);
+        double offset_x_1 = 1.4 * sin(2 * M_PI * i * .0494);
+        double offset_y_1 = .8 * sin(2 * M_PI * i * .0394);
 
 
-    int j = i + 77;
-    int k = i + 300;
-    draw_background(screen, freq_x_1, freq_y_1, offset_x_1, offset_y_1, (color){j % 256, (2 * j) % 256, (3 * j) % 256, 255});
-    draw_background(screen, freq_x_2, freq_y_2, offset_x_2, offset_y_2, (color){k % 256, (2 * k) % 256, (3 * k) % 256, 100});
-    draw_background(screen, freq_y_2, freq_x_1 * .9, offset_y_2, offset_x_1, (color){i % 256, (2 * i) % 256, (3 * i) % 256, 70});
-		send_frame();
-  }
+        double freq_x_2 = .05 * sin(2 * M_PI * i * .00245) + .08;
+        double freq_y_2 = .05 * sin(2 * M_PI * i * .01345) + .08;
+
+        double offset_x_2 = 1.2 * sin(2 * M_PI * i * .0294);
+        double offset_y_2 = .4 * sin(2 * M_PI * i * .0194);
+
+
+        int j = i + 77;
+        int k = i + 300;
+        draw_background(freq_x_1, freq_y_1, offset_x_1, offset_y_1, (color){j % 256, (2 * j) % 256, (3 * j) % 256, 255});
+        draw_background(freq_x_2, freq_y_2, offset_x_2, offset_y_2, (color){k % 256, (2 * k) % 256, (3 * k) % 256, 100});
+        draw_background(freq_y_2, freq_x_1 * .9, offset_y_2, offset_x_1, (color){i % 256, (2 * i) % 256, (3 * i) % 256, 70});
+        send_frame();
+    }
 }
 
 void static_circles() {
@@ -224,28 +228,21 @@ void static_circles() {
     draw_circle(r4, 400, 23, 6, c4);
     draw_circle(r5, 400, 13, 17, c5);
 
-		send_frame();
+	send_frame();
   }
 }
 
 int main() {
-<<<<<<< HEAD
-  byte screen[HEIGHT][WIDTH][PIXEL_SIZE];
-
-  shifting_background(screen);
-  /* static_circles(screen); */
-=======
 	#if TESTING == 0
-	samInit();
-  pioInit();
-  spiInit(MCK_FREQ/244000, 0, 1);
-	pioPinMode(CS_PIN, PIO_OUTPUT);
-	pioPinMode(FLUSHING_PIN, PIO_INPUT);
+    samInit();
+    pioInit();
+    spiInit(MCK_FREQ/244000, 0, 1);
+    pioPinMode(CS_PIN, PIO_OUTPUT);
+    pioPinMode(FLUSHING_PIN, PIO_INPUT);
 	#endif
 
-  // shifting_background(screen);
-  particles_animation();
->>>>>>> b61e2ecdd22fc9a2d69b9b0bd164d29d85295b99
+    // shifting_background(screen);
+    particles_animation();
 }
 
 void draw_background(double freq_x, double freq_y, double offset_x, double offset_y, color bg_color) {
@@ -301,12 +298,13 @@ void clear_frame() {
   }
 }
 
+
+#if TESTING == 0
 void spi_send_byte(byte data){
 	while (pioDigitalRead(FLUSHING_PIN)) {}
   spiSendReceive(data);
 }
 
-// TODO: replace with gpio pin header file
 void set_cs_high(){
   pioDigitalWrite(CS_PIN, PIO_HIGH);
 }
@@ -333,10 +331,9 @@ void send_strip(byte strip_number, byte strip_data[WIDTH][PIXEL_SIZE]){
   set_cs_low();
 }
 
-#if TESTING == 0
 void send_frame(){
   for (int h = 0; h < HEIGHT; h++) {
-    send_strip(h,screen[h]);
+    send_strip(h, screen[h]);
   }
   flush();
 }
@@ -354,7 +351,7 @@ void send_frame() {
 
   for (int h = 0; h < HEIGHT; h++) {
     for (int w = 0; w < WIDTH; w++) {
-      fprintf(fd, "%u,%u,%u\n", frame[h][w][RED], frame[h][w][GREEN], frame[h][w][BLUE]);
+      fprintf(fd, "%u,%u,%u\n", screen[h][w][RED], screen[h][w][GREEN], screen[h][w][BLUE]);
     }
   }
 

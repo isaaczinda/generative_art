@@ -1,4 +1,4 @@
-main: main.c
+main: main.c particles.h
 	gcc -o main main.c
 
 clean:

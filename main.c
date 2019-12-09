@@ -37,15 +37,29 @@
 
 #define FLASH_CONSTANT 70 // 0b10101010
 
-#define FLUSHING_PIN PIO_PA27
-#define CS_PIN PIO_PA28
+#define FLUSHING_PIN PIO_PA26
+#define CS_PIN PIO_PA27
 
 
 typedef unsigned char byte;
 
-byte screen[HEIGHT][WIDTH][PIXEL_SIZE];
+byte screen[HEIGHT * WIDTH * PIXEL_SIZE];
+float g_brightness;
 
-
+byte zero_buffer[HEIGHT * WIDTH * PIXEL_SIZE / 2] = {
+	0,0,0, 0,0,0, 0,0,0, 0,0,0,      0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,
+	0,0,0, 0,0,0, 0,0,0, 0,0,0,      0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,
+	0,0,0, 0,0,0, 0,0,0, 0,0,0,      0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,
+	0,0,0, 0,0,0, 0,0,0, 0,0,0,      0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,
+	0,0,0, 0,0,0, 0,0,0, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 0,0,0,
+	0,0,0, 0,0,0, 0,0,0, 100,100,100, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,
+	0,0,0, 0,0,0, 0,0,0, 100,100,100, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,
+	0,0,0, 0,0,0, 0,0,0, 100,100,100, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,
+	0,0,0, 0,0,0, 0,0,0, 100,100,100, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,
+	0,0,0, 0,0,0, 0,0,0, 100,100,100, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,
+	0,0,0, 0,0,0, 0,0,0, 0,0,0,      0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 
+	0,0,0, 0,0,0, 0,0,0, 0,0,0,      0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0};
+	
 typedef struct {
   byte red;
   byte green;
@@ -67,12 +81,37 @@ void send_frame(void);
 void clear_frame(void);
 void draw_circle(double, int, int, int, color);
 void draw_background(double, double, double, double, color);
+void send_zeros();
 
 #define NUM_PARTICLES 20
 #define FRAME_TIME .01666
 #define SPEED_FACTOR 10
 
 particle particles[NUM_PARTICLES];
+
+void set_screen_color(unsigned char h, unsigned char w, color pixel_color){
+		screen[(h * WIDTH * PIXEL_SIZE) + (w * PIXEL_SIZE)] = pixel_color.red;
+		screen[(h * WIDTH * PIXEL_SIZE) + (w * PIXEL_SIZE) + 1] = pixel_color.green;
+		screen[(h * WIDTH * PIXEL_SIZE) + (w * PIXEL_SIZE) + 2] = pixel_color.blue;	
+}
+
+void set_screen(unsigned char h, unsigned char w, unsigned char red, unsigned char green, unsigned char blue){
+		screen[(h * WIDTH * PIXEL_SIZE) + (w * PIXEL_SIZE)] = red;
+		screen[(h * WIDTH * PIXEL_SIZE) + (w * PIXEL_SIZE) + 1] = green;
+		screen[(h * WIDTH * PIXEL_SIZE) + (w * PIXEL_SIZE) + 2] = blue;
+}
+
+byte get_screen_red(unsigned char h, unsigned char w){
+	return screen[(h * WIDTH * PIXEL_SIZE) + (w * PIXEL_SIZE)];
+}
+
+byte get_screen_green(unsigned char h, unsigned char w){
+	return screen[(h * WIDTH * PIXEL_SIZE) + (w * PIXEL_SIZE) + 1];
+}
+
+byte get_screen_blue(unsigned char h, unsigned char w){
+	return screen[(h * WIDTH * PIXEL_SIZE) + (w * PIXEL_SIZE) + 2];
+}
 
 particle spawn_particle() {
     float rand_x_vel = ((float)(rand() % 20) - 10) / 5.0 * SPEED_FACTOR; // from -2 to 2
@@ -130,9 +169,7 @@ void particles_animation() {
             for (int y = 0; y < HEIGHT; y++) {
                 color pixel_color = get_closest_particle(x, y).col;
 
-                screen[y][x][RED] = pixel_color.red;
-                screen[y][x][GREEN] = pixel_color.green;
-                screen[y][x][BLUE] = pixel_color.blue;
+								set_screen(y,x, pixel_color.red, pixel_color.green, pixel_color.blue);
             }
         }
 
@@ -157,9 +194,7 @@ void test_animation() {
 		// color pixels based on which particle is closest
 		for (int x = 0; x < WIDTH; x++) {
 				for (int y = 0; y < HEIGHT; y++) {
-						screen[y][x][RED] = 255;
-						screen[y][x][GREEN] = 0;
-						screen[y][x][BLUE] = 0;
+						set_screen(y, x, 255, 0, 0);
 				}
 		}
 
@@ -190,9 +225,9 @@ void shifting_background() {
 
     int j = i + 77;
     int k = i + 300;
-    draw_background(screen, freq_x_1, freq_y_1, offset_x_1, offset_y_1, (color){j % 256, (2 * j) % 256, (3 * j) % 256, 255});
-    draw_background(screen, freq_x_2, freq_y_2, offset_x_2, offset_y_2, (color){k % 256, (2 * k) % 256, (3 * k) % 256, 100});
-    draw_background(screen, freq_y_2, freq_x_1 * .9, offset_y_2, offset_x_1, (color){i % 256, (2 * i) % 256, (3 * i) % 256, 70});
+    draw_background(freq_x_1, freq_y_1, offset_x_1, offset_y_1, (color){j % 256, (2 * j) % 256, (3 * j) % 256, 255});
+    draw_background(freq_x_2, freq_y_2, offset_x_2, offset_y_2, (color){k % 256, (2 * k) % 256, (3 * k) % 256, 100});
+    draw_background(freq_y_2, freq_x_1 * .9, offset_y_2, offset_x_1, (color){i % 256, (2 * i) % 256, (3 * i) % 256, 70});
 		send_frame();
   }
 }
@@ -228,24 +263,27 @@ void static_circles() {
   }
 }
 
-int main() {
-<<<<<<< HEAD
-  byte screen[HEIGHT][WIDTH][PIXEL_SIZE];
+void speed_test() {
+	for(int x = 0; x < 1000; x++){
+		send_zeros();
+	}
+}
 
-  shifting_background(screen);
-  /* static_circles(screen); */
-=======
+int main() {
 	#if TESTING == 0
 	samInit();
   pioInit();
-  spiInit(MCK_FREQ/244000, 0, 1);
+  spiInit(35, 0, 1);
 	pioPinMode(CS_PIN, PIO_OUTPUT);
 	pioPinMode(FLUSHING_PIN, PIO_INPUT);
 	#endif
+	
+	g_brightness = .1;
 
-  // shifting_background(screen);
-  particles_animation();
->>>>>>> b61e2ecdd22fc9a2d69b9b0bd164d29d85295b99
+	//speed_test();
+	static_circles();
+  //shifting_background();
+  //particles_animation();
 }
 
 void draw_background(double freq_x, double freq_y, double offset_x, double offset_y, color bg_color) {
@@ -256,10 +294,9 @@ void draw_background(double freq_x, double freq_y, double offset_x, double offse
 
             // from 0 to 1
             double brightness = (( sin(x * 2 * M_PI * freq_x - offset_x) * cos(y * 2 * M_PI * freq_y - offset_y) ) / 2.0) + .5;
-
-            screen[y][x][RED] = (1-opacity) * screen[y][x][RED] + opacity *  brightness * bg_color.red;
-            screen[y][x][BLUE] = (1-opacity) * screen[y][x][BLUE] + opacity * brightness * bg_color.blue;
-            screen[y][x][GREEN] = (1-opacity) * screen[y][x][GREEN] + opacity * brightness * bg_color.green;
+						set_screen(y, x, (1-opacity) * get_screen_red(y,x) + opacity *  brightness * bg_color.red,
+					(1-opacity) * get_screen_green(y,x) + opacity * brightness * bg_color.green,
+					(1-opacity) * get_screen_blue(y,x) + opacity * brightness * bg_color.blue);
         }
     }
 }
@@ -284,20 +321,16 @@ void draw_circle(double radius,
 
     // if the point is in bounds...
     if (x < WIDTH && x >= 0 && y < HEIGHT && y >= 0) {
-      screen[y][x][RED] = floor(circle_color.red * decimal_alpha + screen[y][x][RED] * (1-decimal_alpha));
-      screen[y][x][GREEN] = floor(circle_color.green * decimal_alpha + screen[y][x][GREEN] * (1-decimal_alpha));
-      screen[y][x][BLUE] = floor(circle_color.blue * decimal_alpha + screen[y][x][BLUE] * (1-decimal_alpha));
+			set_screen(y, x, floor(circle_color.red * decimal_alpha + get_screen_red(y,x) * (1-decimal_alpha)),
+									floor(circle_color.green * decimal_alpha + get_screen_green(y,x) * (1-decimal_alpha)),
+									floor(circle_color.blue * decimal_alpha + get_screen_blue(y,x) * (1-decimal_alpha)));
     }
   }
 }
 
 void clear_frame() {
-  for (int x = 0; x < WIDTH; x++) {
-    for (int y = 0; y < HEIGHT; y++) {
-      screen[y][x][RED] = 0;
-      screen[y][x][GREEN] = 0;
-      screen[y][x][BLUE] = 0;
-    }
+  for (int x = 0; x < WIDTH * HEIGHT * PIXEL_SIZE; x++) {
+		screen[x] = 0;
   }
 }
 
@@ -327,16 +360,41 @@ void send_strip(byte strip_number, byte strip_data[WIDTH][PIXEL_SIZE]){
 	spi_send_byte(0); // 0 offset
   for (int w = 0; w < WIDTH; w++) {
     for (int p = 0; p < PIXEL_SIZE; p++){
-      spi_send_byte(strip_data[w][p]); // send all of the data from the strip using "burst mode"
+      spi_send_byte((char) strip_data[w][p]); // send all of the data from the strip using "burst mode"
     }
   }
   set_cs_low();
 }
 
+void send_zeros(){
+  for (int h = 0; h < HEIGHT; h++) {
+      set_cs_high();
+			spi_send_byte(h); // Start by sending strip number
+			spi_send_byte(0); // 0 offset
+			unsigned char adjusted_h = h % (HEIGHT / 2);
+			for (int w = 0; w < WIDTH; w++) {
+				for (int p = 0; p < PIXEL_SIZE; p++){
+					unsigned int offset = (adjusted_h * WIDTH * PIXEL_SIZE) + (w * PIXEL_SIZE) + p;
+					spi_send_byte((char) zero_buffer[offset]); // send all of the data from the strip using "burst mode"
+				}
+			}
+			set_cs_low();
+  }
+  flush();
+}
+
 #if TESTING == 0
 void send_frame(){
   for (int h = 0; h < HEIGHT; h++) {
-    send_strip(h,screen[h]);
+      set_cs_high();
+			spi_send_byte(h); // Start by sending strip number
+			spi_send_byte(0); // 0 offset
+			for (int w = 0; w < WIDTH; w++) {
+				for (int p = 0; p < PIXEL_SIZE; p++){
+					spi_send_byte((char) screen[(h * WIDTH * PIXEL_SIZE) + (w * PIXEL_SIZE) + p] * g_brightness); // send all of the data from the strip using "burst mode"
+				}
+			}
+			set_cs_low();
   }
   flush();
 }

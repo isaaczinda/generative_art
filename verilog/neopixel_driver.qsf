@@ -41,7 +41,7 @@ set_global_assignment -name DEVICE EP4CE6E22C8
 set_global_assignment -name TOP_LEVEL_ENTITY top
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 18.0.0
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "15:21:24  NOVEMBER 10, 2019"
-set_global_assignment -name LAST_QUARTUS_VERSION "18.0.0 Lite Edition"
+set_global_assignment -name LAST_QUARTUS_VERSION "13.0 SP1"
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
@@ -60,13 +60,34 @@ set_location_assignment PIN_113 -to sclk
 set_location_assignment PIN_1 -to reset
 set_location_assignment PIN_2 -to pixels[0]
 set_location_assignment PIN_112 -to mosi
-set_location_assignment PIN_7 -to flushing
-set_location_assignment PIN_3 -to cs
+set_location_assignment PIN_59 -to flushing
+set_location_assignment PIN_58 -to cs
 set_location_assignment PIN_88 -to clk
-set_location_assignment PIN_49 -to p49
-set_location_assignment PIN_50 -to p50
 set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "2.5 V"
-set_location_assignment PIN_10 -to pixels[1]
-set_location_assignment PIN_11 -to pixels[2]
-set_location_assignment PIN_60 -to pixels[3]
+set_location_assignment PIN_3 -to pixels[1]
+set_location_assignment PIN_7 -to pixels[2]
+set_location_assignment PIN_10 -to pixels[3]
+set_location_assignment PIN_11 -to pixels[4]
+set_location_assignment PIN_28 -to pixels[5]
+set_location_assignment PIN_30 -to pixels[6]
+set_location_assignment PIN_31 -to pixels[7]
+set_location_assignment PIN_32 -to pixels[8]
+set_location_assignment PIN_33 -to pixels[9]
+set_location_assignment PIN_34 -to pixels[10]
+set_location_assignment PIN_38 -to pixels[11]
+set_location_assignment PIN_39 -to pixels[12]
+set_location_assignment PIN_42 -to pixels[13]
+set_location_assignment PIN_43 -to pixels[14]
+set_location_assignment PIN_44 -to pixels[15]
+set_location_assignment PIN_46 -to pixels[16]
+set_location_assignment PIN_49 -to pixels[17]
+set_location_assignment PIN_50 -to pixels[18]
+set_location_assignment PIN_51 -to pixels[19]
+set_location_assignment PIN_52 -to pixels[20]
+set_location_assignment PIN_53 -to pixels[21]
+set_location_assignment PIN_54 -to pixels[22]
+set_location_assignment PIN_55 -to pixels[23]
+set_location_assignment PIN_71 -to spi_state[1]
+set_location_assignment PIN_72 -to spi_state[0]
+set_location_assignment PIN_60 -to cs_out
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

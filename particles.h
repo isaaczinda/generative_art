@@ -9,13 +9,13 @@
 #define NUM_PARTICLES 20
 #define SPEED_FACTOR 1
 // units per pixel
-#define UPS 128
+#define UPS 1024
 // max velocity (in units / frame)
 // note that this is not pixels / frame
-#define MAX_VEL_UNITS 64
+#define MAX_VEL_UNITS 50
 
 // how much velocity changes by each frame in y direction
-#define GRAVITY 2
+#define GRAVITY 10
 #define FALSE 0
 #define TRUE 1
 
@@ -59,10 +59,11 @@ particle spawn_particle() {
 particle get_closest_particle(int x_pos, int y_pos) {
     particle closest_particle;
     // larger than max distance
-    int closest_particle_distance = 100 * UPS*20;
+    unsigned int closest_particle_distance = 4294967295; // max value of int
 
     for (int i = 0; i < NUM_PARTICLES; i++) {
-        int distance = (int) sqrt(pow(x_pos - particles[i].x_pos, 2) + pow(y_pos - particles[i].y_pos, 2));
+        int distance = (x_pos - particles[i].x_pos) * (x_pos - particles[i].x_pos) +
+											 (y_pos - particles[i].y_pos) * (y_pos - particles[i].y_pos);
 
         // this will make the pattern look worse, but will save LOTS of cycles
         // int distance = abs(x_pos - particles[i].x_pos) + abs(y_pos - particles[i].y_pos);
@@ -76,13 +77,19 @@ particle get_closest_particle(int x_pos, int y_pos) {
     return closest_particle;
 }
 
+float p;
+
 void particles_animation() {
     // initialize all particles to
     for (int s = 0; s < NUM_PARTICLES; s++) {
         particles[s].active = FALSE;
     }
 
-    for (int i = 0; i < 1000; i++) {
+    while (TRUE) {
+				// for (int i = 0; i < 10000; i++) { // 100000 2 fps
+				//	p = sqrt(i); 
+				//}
+			
         for (int s = 0; s < NUM_PARTICLES; s++) {
             // add this particle if it has fallen off of the screen
             if (particles[s].active == FALSE) {

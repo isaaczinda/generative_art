@@ -411,6 +411,16 @@
               <FileType>1</FileType>
               <FilePath>.\main.c</FilePath>
             </File>
+            <File>
+              <FileName>particles.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\particles.h</FilePath>
+            </File>
+            <File>
+              <FileName>screen.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\screen.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

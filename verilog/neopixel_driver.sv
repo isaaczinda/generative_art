@@ -13,15 +13,6 @@ module neopixel_driver #(parameter STRIP_LENGTH)
 	logic flush, write_en;
 	logic [7:0] write_data, write_addr;
 	logic [4:0] strip_num;
-//	logic p49, p50;
-	
-	
-//	module spi(input logic clk, sclk, mosi, cs,
-//			  output logic flush, write_en, 
-//			  output logic [7:0] write_data,
-//			  output logic [7:0] write_offset,
-//			  output logic [4:0] strip_num,
-//			  output logic p49, p50);
 	
 	spi spi(clk, sclk, mosi, cs, flush, write_en, write_data, write_addr, strip_num, p49, p50);
 	

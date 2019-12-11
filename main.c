@@ -1,5 +1,8 @@
-#include "particles.h"
+// outputs frame to local files when we are testing
+// outputs frame to strips over SPI when we aren't testing
+#define TESTING 0
 
+#include "particles.h"
 
 // need to redefine this sometimes because ATSAM's version of math.h doesn't
 // include this constant
@@ -10,8 +13,6 @@
 // to simplify boolean logic
 #define TRUE 1
 #define FALSE 0
-
-
 
 typedef unsigned char byte;
 
@@ -159,5 +160,3 @@ void clear_frame() {
 		screen[x] = 0;
   }
 }
-
-

@@ -12,10 +12,6 @@ typedef struct {
   byte alpha;
 } color;
 
-// outputs frame to local files when we are testing
-// outputs frame to strips over SPI when we aren't testing
-#define TESTING 0
-
 // number of cols
 #define WIDTH 25
 

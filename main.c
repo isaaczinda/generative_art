@@ -1,11 +1,4 @@
-// outputs frame to local files when we are testing
-// outputs frame to strips over SPI when we aren't testing
-
-
 #include "particles.h"
-
-
-// only include os libraries when we're testing
 
 
 // need to redefine this sometimes because ATSAM's version of math.h doesn't
@@ -13,10 +6,6 @@
 #ifndef M_PI
 #define M_PI 3.1415
 #endif
-
-#define RED 0
-#define GREEN 1
-#define BLUE 2
 
 // to simplify boolean logic
 #define TRUE 1

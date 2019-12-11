@@ -1,3 +1,7 @@
+/*
+screen.h
+*/
+
 #include <stdio.h>
 
 typedef unsigned char byte;
@@ -7,18 +11,31 @@ typedef struct {
   byte blue;
   byte alpha;
 } color;
+
+// outputs frame to local files when we are testing
+// outputs frame to strips over SPI when we aren't testing
 #define TESTING 0
+
 // number of cols
 #define WIDTH 25
+
 // number of rows
 #define HEIGHT 24
+
+// we send 3 pixels -- red, green, blue -- over SPI
 #define PIXEL_SIZE 3
+
+// constant we send when we want to flush
 #define FLASH_CONSTANT 70 // 0b10101010
+
+// all colors are bitshifted by this constant, which acts like a dimmer
 #define BRIGHTNESS_SHIFT 2
 
+#define RED 0
+#define GREEN 1
+#define BLUE 2
 
 #if TESTING == 1
-
 #include <sys/stat.h>
 #include <sys/types.h>
 #endif
@@ -31,20 +48,6 @@ typedef struct {
 #define CS_PIN PIO_PA27
 
 byte screen[HEIGHT * WIDTH * PIXEL_SIZE];
-
-byte zero_buffer[HEIGHT * WIDTH * PIXEL_SIZE / 2] = {
-	0,0,0, 0,0,0, 0,0,0, 0,0,0,      0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,
-	0,0,0, 0,0,0, 0,0,0, 0,0,0,      0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,
-	0,0,0, 0,0,0, 0,0,0, 0,0,0,      0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,
-	0,0,0, 0,0,0, 0,0,0, 0,0,0,      0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,
-	0,0,0, 0,0,0, 0,0,0, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 100,100,100, 0,0,0,
-	0,0,0, 0,0,0, 0,0,0, 100,100,100, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,
-	0,0,0, 0,0,0, 0,0,0, 100,100,100, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,
-	0,0,0, 0,0,0, 0,0,0, 100,100,100, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,
-	0,0,0, 0,0,0, 0,0,0, 100,100,100, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,
-	0,0,0, 0,0,0, 0,0,0, 100,100,100, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,
-	0,0,0, 0,0,0, 0,0,0, 0,0,0,      0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0,
-	0,0,0, 0,0,0, 0,0,0, 0,0,0,      0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0};
 
 void set_screen_color(unsigned char h, unsigned char w, color pixel_color){
   screen[(h * WIDTH * PIXEL_SIZE) + (w * PIXEL_SIZE)] = pixel_color.red;
@@ -100,23 +103,6 @@ void send_strip(byte strip_number, byte strip_data[WIDTH][PIXEL_SIZE]){
     }
   }
   set_cs_low();
-}
-
-void send_zeros(){
-  for (int h = 0; h < HEIGHT; h++) {
-      set_cs_high();
-			spi_send_byte(h); // Start by sending strip number
-			spi_send_byte(0); // 0 offset
-			unsigned char adjusted_h = h % (HEIGHT / 2);
-			for (int w = 0; w < WIDTH; w++) {
-				for (int p = 0; p < PIXEL_SIZE; p++){
-					unsigned int offset = (adjusted_h * WIDTH * PIXEL_SIZE) + (w * PIXEL_SIZE) + p;
-					spi_send_byte((char) zero_buffer[offset]); // send all of the data from the strip using "burst mode"
-				}
-			}
-			set_cs_low();
-  }
-  flush();
 }
 #endif
 

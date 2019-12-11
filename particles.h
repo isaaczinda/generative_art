@@ -1,5 +1,9 @@
-// Because we want to work with integers and not floats, all velocities and
-// posititions are measured in 1/10th pixel units
+/* 
+particles.h
+
+Because we want to work with integers and not floats, all velocities and
+posititions are measured in 1/1024th pixel units.
+*/
 
 #include "screen.h"
 #include <stdio.h>
@@ -31,16 +35,9 @@ typedef struct {
 
 particle particles[NUM_PARTICLES];
 
-/*
-
-*/
 int randrange(int min, int max) {
     return (rand() % (max-min)) + min;
 }
-
-/*
-
-*/
 particle spawn_particle() {
     int rand_x_vel = randrange(-MAX_VEL_UNITS, MAX_VEL_UNITS);
     int rand_y_vel = randrange(-MAX_VEL_UNITS, MAX_VEL_UNITS);

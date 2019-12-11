@@ -1,28 +1,12 @@
 // outputs frame to local files when we are testing
 // outputs frame to strips over SPI when we aren't testing
-#define TESTING 1
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
+
+#include "particles.h"
 
 
 // only include os libraries when we're testing
-#if TESTING == 1
 
-#include <sys/stat.h>
-#include <sys/types.h>
-#endif
-
-#if TESTING == 0
-#include "SAM4S4B_libs/SAM4S4B.h"
-#endif
-
-// number of cols
-#define WIDTH 25
-// number of rows
-#define HEIGHT 24
-#define PIXEL_SIZE 3
 
 // need to redefine this sometimes because ATSAM's version of math.h doesn't
 // include this constant
@@ -38,29 +22,17 @@
 #define TRUE 1
 #define FALSE 0
 
-#define FLASH_CONSTANT 70 // 0b10101010
 
-#define FLUSHING_PIN PIO_PA27
-#define CS_PIN PIO_PA28
 
 typedef unsigned char byte;
 
-byte screen[HEIGHT][WIDTH][PIXEL_SIZE];
-
-typedef struct {
-  byte red;
-  byte green;
-  byte blue;
-  byte alpha;
-} color;
 
 void render_frame(void);
-void send_frame(void);
 void clear_frame(void);
 void draw_circle(double, int, int, int, color);
 void draw_background(double, double, double, double, color);
+void send_zeros();
 
-#include "particles.h"
 
 void test_animation() {
 	byte color = 0;
@@ -68,11 +40,9 @@ void test_animation() {
 	while (TRUE) {
 		// color pixels based on which particle is closest
 		for (int x = 0; x < WIDTH; x++) {
-			for (int y = 0; y < HEIGHT; y++) {
-				screen[y][x][RED] = 255;
-				screen[y][x][GREEN] = 0;
-				screen[y][x][BLUE] = 0;
-			}
+				for (int y = 0; y < HEIGHT; y++) {
+						set_screen(y, x, 255, 0, 0);
+				}
 		}
 
 		color += 1;
@@ -144,12 +114,12 @@ int main() {
 	#if TESTING == 0
     samInit();
     pioInit();
-    spiInit(MCK_FREQ/244000, 0, 1);
+    spiInit(72, 0, 1);
     pioPinMode(CS_PIN, PIO_OUTPUT);
     pioPinMode(FLUSHING_PIN, PIO_INPUT);
 	#endif
 
-    // shifting_background(screen);
+    // static_circles();
     particles_animation();
 }
 
@@ -161,10 +131,9 @@ void draw_background(double freq_x, double freq_y, double offset_x, double offse
 
             // from 0 to 1
             double brightness = (( sin(x * 2 * M_PI * freq_x - offset_x) * cos(y * 2 * M_PI * freq_y - offset_y) ) / 2.0) + .5;
-
-            screen[y][x][RED] = (1-opacity) * screen[y][x][RED] + opacity *  brightness * bg_color.red;
-            screen[y][x][BLUE] = (1-opacity) * screen[y][x][BLUE] + opacity * brightness * bg_color.blue;
-            screen[y][x][GREEN] = (1-opacity) * screen[y][x][GREEN] + opacity * brightness * bg_color.green;
+						set_screen(y, x, (1-opacity) * get_screen_red(y,x) + opacity *  brightness * bg_color.red,
+					(1-opacity) * get_screen_green(y,x) + opacity * brightness * bg_color.green,
+					(1-opacity) * get_screen_blue(y,x) + opacity * brightness * bg_color.blue);
         }
     }
 }
@@ -189,81 +158,17 @@ void draw_circle(double radius,
 
     // if the point is in bounds...
     if (x < WIDTH && x >= 0 && y < HEIGHT && y >= 0) {
-      screen[y][x][RED] = floor(circle_color.red * decimal_alpha + screen[y][x][RED] * (1-decimal_alpha));
-      screen[y][x][GREEN] = floor(circle_color.green * decimal_alpha + screen[y][x][GREEN] * (1-decimal_alpha));
-      screen[y][x][BLUE] = floor(circle_color.blue * decimal_alpha + screen[y][x][BLUE] * (1-decimal_alpha));
+			set_screen(y, x, floor(circle_color.red * decimal_alpha + get_screen_red(y,x) * (1-decimal_alpha)),
+									floor(circle_color.green * decimal_alpha + get_screen_green(y,x) * (1-decimal_alpha)),
+									floor(circle_color.blue * decimal_alpha + get_screen_blue(y,x) * (1-decimal_alpha)));
     }
   }
 }
 
 void clear_frame() {
-  for (int x = 0; x < WIDTH; x++) {
-    for (int y = 0; y < HEIGHT; y++) {
-      screen[y][x][RED] = 0;
-      screen[y][x][GREEN] = 0;
-      screen[y][x][BLUE] = 0;
-    }
+  for (int x = 0; x < WIDTH * HEIGHT * PIXEL_SIZE; x++) {
+		screen[x] = 0;
   }
 }
 
 
-#if TESTING == 0
-void spi_send_byte(byte data){
-	while (pioDigitalRead(FLUSHING_PIN)) {}
-  spiSendReceive(data);
-}
-
-void set_cs_high(){
-  pioDigitalWrite(CS_PIN, PIO_HIGH);
-}
-
-void set_cs_low(){
-  pioDigitalWrite(CS_PIN, PIO_LOW);
-}
-
-void flush(){
-  set_cs_high();
-  spi_send_byte(FLASH_CONSTANT);
-  set_cs_low();
-}
-
-void send_strip(byte strip_number, byte strip_data[WIDTH][PIXEL_SIZE]){
-  set_cs_high();
-  spi_send_byte(strip_number); // Start by sending strip number
-	spi_send_byte(0); // 0 offset
-  for (int w = 0; w < WIDTH; w++) {
-    for (int p = 0; p < PIXEL_SIZE; p++){
-      spi_send_byte(strip_data[w][p]); // send all of the data from the strip using "burst mode"
-    }
-  }
-  set_cs_low();
-}
-
-void send_frame(){
-  for (int h = 0; h < HEIGHT; h++) {
-    send_strip(h, screen[h]);
-  }
-  flush();
-}
-#endif
-
-#if TESTING == 1
-void send_frame() {
-  static int frame_number = 0;
-  char frame_name[50];
-
-  sprintf(frame_name, "frames/frame_%d.txt", frame_number);
-
-  int result = mkdir("frames", 0777); // create frames dir if it doesn't exist
-  FILE* fd = fopen(frame_name, "w+");
-
-  for (int h = 0; h < HEIGHT; h++) {
-    for (int w = 0; w < WIDTH; w++) {
-      fprintf(fd, "%u,%u,%u\n", screen[h][w][RED], screen[h][w][GREEN], screen[h][w][BLUE]);
-    }
-  }
-
-  fclose(fd);
-  frame_number += 1;
-}
-#endif

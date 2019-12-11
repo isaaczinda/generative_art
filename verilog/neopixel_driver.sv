@@ -1,8 +1,13 @@
 module top (input logic clk, reset, sclk, mosi, cs,
 					 output logic [23:0] pixels,
-					 output logic flushing, p49, p50, p51, p52);
+					 output logic flushing, cs_out,
+					 output logic [1:0] spi_state);
 					 
-	neopixel_driver #(75) neopixel_driver1(clk, reset, sclk, mosi, cs, pixels, flushing, p49, p50);
+	logic p49, p50;
+	
+	assign cs_out = cs;
+					 
+	neopixel_driver #(75) neopixel_driver1(clk, reset, sclk, mosi, cs, pixels, flushing, spi_state[0], spi_state[1]);
 endmodule
 
 module neopixel_driver #(parameter STRIP_LENGTH)

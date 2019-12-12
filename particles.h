@@ -1,4 +1,4 @@
-/* 
+/*
 particles.h
 
 Because we want to work with integers and not floats, all velocities and
@@ -11,7 +11,7 @@ posititions are measured in 1/1024th pixel units.
 #include <math.h>
 
 #define NUM_PARTICLES 20
-#define SPEED_FACTOR 1
+
 // units per pixel
 #define UPS 1024
 // max velocity (in units / frame)
@@ -84,9 +84,9 @@ void particles_animation() {
 
     while (TRUE) {
 				// for (int i = 0; i < 10000; i++) { // 100000 2 fps
-				//	p = sqrt(i); 
+				//	p = sqrt(i);
 				//}
-			
+
         for (int s = 0; s < NUM_PARTICLES; s++) {
             // add this particle if it has fallen off of the screen
             if (particles[s].active == FALSE) {

@@ -69,6 +69,9 @@ byte get_screen_blue(unsigned char h, unsigned char w){
 	return screen[(h * WIDTH * PIXEL_SIZE) + (w * PIXEL_SIZE) + 2];
 }
 
+/*
+Code which is used in order to send frames over SPI (not for testing).
+*/
 #if TESTING == 0
 void spi_send_byte(byte data){
 	while (pioDigitalRead(FLUSHING_PIN)) {}
@@ -102,6 +105,9 @@ void send_strip(byte strip_number, byte strip_data[WIDTH][PIXEL_SIZE]){
 }
 #endif
 
+/*
+Code which is used to save frames to files (for testing).
+*/
 #if TESTING == 0
 void send_frame(){
   for (int h = 0; h < HEIGHT; h++) {
